@@ -1,0 +1,80 @@
+import { createRouter, createWebHistory } from 'vue-router'
+import NewOrder from "../views/doctor/createOrder.vue"
+import homeComponent from "@/views/home/homeComponent.vue";
+import login from "@/views/auth/login.vue";
+import AllOrders from "@/views/doctor/allOrders.vue";
+import ShowOrder from '@/views/doctor/showOrders.vue';
+import LabOrders from "@/views/lab/labOrders.vue";
+import showOrderlab from "@/views/lab/showOrder.vue";
+import myDoctors from "@/views/lab/myDoctors.vue";
+import addDoctor from "@/views/lab/addDoctor.vue";
+import contract from "@/views/lab/contractView.vue";
+import deliverMain from "@/views/Delivery/pageDelivery.vue";
+const routes = [
+  {
+    path:'/',
+    name: "homeComponent",
+    component: homeComponent
+  },
+  {
+    path: '/create-order',
+    name: "create-order",
+    component: NewOrder,
+  },
+  {
+    path: '/login',
+    name: "login",
+    component: login,
+  },
+  {
+    path: "/doctor/orders",
+    name: "AllOrders",
+    component: AllOrders,
+  },
+  {
+    path: '/orders/:id',
+    name: 'showOrder',
+    component: ShowOrder,
+    meta: { requiresAuth: true },
+    props: true
+  },
+  {
+    path: '/lab',
+    name: "LabOrders",
+    component: LabOrders
+  },
+  {
+    path: '/showOrderlab/:id',
+    name: "showOrderlab",
+    component: showOrderlab,
+    meta: { requiresAuth: true },
+    props: true
+  },
+  {
+    path: '/my-doctors',
+    name: 'myDoctors',
+    component: myDoctors,
+  },
+  {
+    path: '/lab/add-doctor',
+    name: 'addDoctor',
+    component: addDoctor,
+  },
+  {
+    path:'/doctor-contract/:id',
+    name: 'contractContract',
+    component: contract
+  },
+  {
+    path: '/deliver-main',
+    name: 'deliverMain',
+    component: deliverMain,
+  }
+]
+
+const router = createRouter({
+  history: createWebHistory(process.env.BASE_URL),
+  routes
+})
+
+export default router
