@@ -1,300 +1,299 @@
 <template>
-
   <DoctorNavbar />
-    <!-- Form Container -->
-    <div class="form-container" ref="formContainer">
-      <div class="order-id-box">{{ orderId || 'Order ID: --' }}</div>
+  <div class="form-container" ref="formContainer">
+    <div class="order-id-box">{{ orderId || 'Order ID: --' }}</div>
 
-      <form @submit.prevent="submitOrder">
-        <fieldset>
-          <legend>Patient Information</legend>
+    <form @submit.prevent="submitOrder">
+      <fieldset>
+        <legend>Patient Information</legend>
 
-          <!-- Status -->
-          <label for="status">Status:</label>
-          <select v-model="orderData.prova" id="status">
-            <option :value="true">Provisional</option>
-            <option :value="false">Final</option>
-          </select>
-          <span class="error" v-if="errors.prova">{{ errors.prova }}</span>
+        <!-- Status -->
+        <label for="status">Status:</label>
+        <select v-model="orderData.prova" id="status">
+          <option :value="true">Provisional</option>
+          <option :value="false">Final</option>
+        </select>
+        <span class="error" v-if="errors.prova">{{ errors.prova }}</span>
 
-          <!-- Patient Name -->
-          <label for="patientName">Patient's Name:</label>
-          <input
-              type="text"
-              id="patientName"
-              v-model="orderData.patientName"
-              required
-          />
-          <span class="error" v-if="errors.patientName">{{
-              errors.patientName
-            }}</span>
+        <!-- Patient Name -->
+        <label for="patientName">Patient's Name:</label>
+        <input
+            type="text"
+            id="patientName"
+            v-model="orderData.patientName"
+            required
+        />
+        <span class="error" v-if="errors.patientName">{{ errors.patientName }}</span>
 
-          <!-- Gender -->
-          <label for="patientGender">Gender:</label>
-          <select v-model="orderData.sex" id="patientGender">
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-          </select>
-          <span class="error" v-if="errors.sex">{{ errors.sex }}</span>
+        <!-- Gender -->
+        <label for="patientGender">Gender:</label>
+        <select v-model="orderData.sex" id="patientGender">
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+        </select>
+        <span class="error" v-if="errors.sex">{{ errors.sex }}</span>
 
-          <!-- Age -->
-          <label for="patientAge">Age:</label>
-          <input
-              type="number"
-              id="patientAge"
-              v-model="orderData.age"
-              required
-          />
-          <span class="error" v-if="errors.age">{{ errors.age }}</span>
+        <!-- Age -->
+        <label for="patientAge">Age:</label>
+        <input
+            type="number"
+            id="patientAge"
+            v-model="orderData.age"
+            required
+        />
+        <span class="error" v-if="errors.age">{{ errors.age }}</span>
 
-          <!-- Number of Teeth -->
-          <label for="teethCount">Number of Teeth Treated:</label>
-          <input
-              type="number"
-              id="teethCount"
-              v-model="orderData.teethNo"
-              required
-              readonly
-          />
-          <span class="error" v-if="errors.teethNo">{{ errors.teethNo }}</span>
+        <!-- Number of Teeth -->
+        <label for="teethCount">Number of Teeth Treated:</label>
+        <input
+            type="number"
+            id="teethCount"
+            v-model="orderData.teethNo"
+            required
+            readonly
+        />
+        <span class="error" v-if="errors.teethNo">{{ errors.teethNo }}</span>
 
-          <!-- Type of Teeth -->
-          <label for="toothType">Type of Teeth:</label>
-          <input type="text" id="toothType" v-model="orderData.type" required />
-          <span class="error" v-if="errors.type">{{ errors.type }}</span>
+        <!-- Lab Selection -->
+        <label for="labId">Lab:</label>
+        <select v-model="orderData.labId" id="labId" @change="updateTeethTypes">
+          <option value="" disabled>Select a lab</option>
+          <option v-for="lab in labs" :key="lab._id" :value="lab._id">
+            {{ lab.username }}
+          </option>
+        </select>
+        <span class="error" v-if="errors.labId">{{ errors.labId }}</span>
 
-          <!-- Tooth Selection -->
-          <h2>اضغط على السن لاختياره</h2>
-          <div
-              id="tooth-description"
-              class="description"
-              :class="{ visible: selectedTeeth.length > 0 }"
-          >
-            لقد اخترت السن رقم: <span id="tooth-number">{{ selectedTeeth.join(", ") }}</span>
-          </div>
+        <!-- Type of Teeth (Dynamic based on selected lab) -->
+        <label for="toothType">Type of Teeth:</label>
+        <select id="toothType" v-model="orderData.type" required>
+          <option value="" disabled>Select tooth type</option>
+          <option v-for="(price, type) in availableTeethTypes" :key="type" :value="type">
+            {{ type }} ({{ formatCurrency(price) }})
+          </option>
+        </select>
+        <span class="error" v-if="errors.type">{{ errors.type }}</span>
 
-          <!-- Upper Teeth (17-32) -->
-          <div class="teeth-container">
-            <div class="tooth-wrapper">
-              <img src="../../assets/img/17.jpeg" alt="Tooth 17" class="tooth-img" :class="{ selected: selectedTeeth.includes(17) }" @click="toggleTooth(17)">
-              <div class="tooth-number">17</div>
-            </div>
-            <div class="tooth-wrapper">
-              <img src="../../assets/img/18.jpeg" alt="Tooth 18" class="tooth-img" :class="{ selected: selectedTeeth.includes(18) }" @click="toggleTooth(18)">
-              <div class="tooth-number">18</div>
-            </div>
-            <div class="tooth-wrapper">
-              <img src="../../assets/img/19.jpeg" alt="Tooth 19" class="tooth-img" :class="{ selected: selectedTeeth.includes(19) }" @click="toggleTooth(19)">
-              <div class="tooth-number">19</div>
-            </div>
-            <div class="tooth-wrapper">
-              <img src="../../assets/img/20.jpeg" alt="Tooth 20" class="tooth-img" :class="{ selected: selectedTeeth.includes(20) }" @click="toggleTooth(20)">
-              <div class="tooth-number">20</div>
-            </div>
-            <div class="tooth-wrapper">
-              <img src="../../assets/img/21.jpeg" alt="Tooth 21" class="tooth-img" :class="{ selected: selectedTeeth.includes(21) }" @click="toggleTooth(21)">
-              <div class="tooth-number">21</div>
-            </div>
-            <div class="tooth-wrapper">
-              <img src="../../assets/img/22.jpeg" alt="Tooth 22" class="tooth-img" :class="{ selected: selectedTeeth.includes(22) }" @click="toggleTooth(22)">
-              <div class="tooth-number">22</div>
-            </div>
-            <div class="tooth-wrapper">
-              <img src="../../assets/img/23.jpeg" alt="Tooth 23" class="tooth-img" :class="{ selected: selectedTeeth.includes(23) }" @click="toggleTooth(23)">
-              <div class="tooth-number">23</div>
-            </div>
-            <div class="tooth-wrapper">
-              <img src="../../assets/img/24.jpeg" alt="Tooth 24" class="tooth-img" :class="{ selected: selectedTeeth.includes(24) }" @click="toggleTooth(24)">
-              <div class="tooth-number">24</div>
-            </div>
-            <div class="tooth-wrapper">
-              <img src="../../assets/img/25.jpeg" alt="Tooth 25" class="tooth-img" :class="{ selected: selectedTeeth.includes(25) }" @click="toggleTooth(25)">
-              <div class="tooth-number">25</div>
-            </div>
-            <div class="tooth-wrapper">
-              <img src="../../assets/img/26.jpeg" alt="Tooth 26" class="tooth-img" :class="{ selected: selectedTeeth.includes(26) }" @click="toggleTooth(26)">
-              <div class="tooth-number">26</div>
-            </div>
-            <div class="tooth-wrapper">
-              <img src="../../assets/img/27.jpeg" alt="Tooth 27" class="tooth-img" :class="{ selected: selectedTeeth.includes(27) }" @click="toggleTooth(27)">
-              <div class="tooth-number">27</div>
-            </div>
-            <div class="tooth-wrapper">
-              <img src="../../assets/img/28.jpeg" alt="Tooth 28" class="tooth-img" :class="{ selected: selectedTeeth.includes(28) }" @click="toggleTooth(28)">
-              <div class="tooth-number">28</div>
-            </div>
-            <div class="tooth-wrapper">
-              <img src="../../assets/img/29.jpeg" alt="Tooth 29" class="tooth-img" :class="{ selected: selectedTeeth.includes(29) }" @click="toggleTooth(29)">
-              <div class="tooth-number">29</div>
-            </div>
-            <div class="tooth-wrapper">
-              <img src="../../assets/img/30.jpeg" alt="Tooth 30" class="tooth-img" :class="{ selected: selectedTeeth.includes(30) }" @click="toggleTooth(30)">
-              <div class="tooth-number">30</div>
-            </div>
-            <div class="tooth-wrapper">
-              <img src="../../assets/img/31.jpeg" alt="Tooth 31" class="tooth-img" :class="{ selected: selectedTeeth.includes(31) }" @click="toggleTooth(31)">
-              <div class="tooth-number">31</div>
-            </div>
-            <div class="tooth-wrapper">
-              <img src="../../assets/img/32.jpeg" alt="Tooth 32" class="tooth-img" :class="{ selected: selectedTeeth.includes(32) }" @click="toggleTooth(32)">
-              <div class="tooth-number">32</div>
-            </div>
-          </div>
-
-          <!-- Lower Teeth (1-15) -->
-          <div class="teeth-container">
-            <div class="tooth-wrapper">
-              <img src="../../assets/img/1.jpeg" alt="Tooth 1" class="tooth-img" :class="{ selected: selectedTeeth.includes(1) }" @click="toggleTooth(1)">
-              <div class="tooth-number">1</div>
-            </div>
-            <div class="tooth-wrapper">
-              <img src="../../assets/img/2.jpeg" alt="Tooth 2" class="tooth-img" :class="{ selected: selectedTeeth.includes(2) }" @click="toggleTooth(2)">
-              <div class="tooth-number">2</div>
-            </div>
-            <div class="tooth-wrapper">
-              <img src="../../assets/img/3.jpeg" alt="Tooth 3" class="tooth-img" :class="{ selected: selectedTeeth.includes(3) }" @click="toggleTooth(3)">
-              <div class="tooth-number">3</div>
-            </div>
-            <div class="tooth-wrapper">
-              <img src="../../assets/img/4.jpeg" alt="Tooth 4" class="tooth-img" :class="{ selected: selectedTeeth.includes(4) }" @click="toggleTooth(4)">
-              <div class="tooth-number">4</div>
-            </div>
-            <div class="tooth-wrapper">
-              <img src="../../assets/img/5.jpeg" alt="Tooth 5" class="tooth-img" :class="{ selected: selectedTeeth.includes(5) }" @click="toggleTooth(5)">
-              <div class="tooth-number">5</div>
-            </div>
-            <div class="tooth-wrapper">
-              <img src="../../assets/img/6.jpeg" alt="Tooth 6" class="tooth-img" :class="{ selected: selectedTeeth.includes(6) }" @click="toggleTooth(6)">
-              <div class="tooth-number">6</div>
-            </div>
-            <div class="tooth-wrapper">
-              <img src="../../assets/img/7.jpeg" alt="Tooth 7" class="tooth-img" :class="{ selected: selectedTeeth.includes(7) }" @click="toggleTooth(7)">
-              <div class="tooth-number">7</div>
-            </div>
-            <div class="tooth-wrapper">
-              <img src="../../assets/img/8.jpeg" alt="Tooth 8" class="tooth-img" :class="{ selected: selectedTeeth.includes(8) }" @click="toggleTooth(8)">
-              <div class="tooth-number">8</div>
-            </div>
-            <div class="tooth-wrapper">
-              <img src="../../assets/img/9.jpeg" alt="Tooth 9" class="tooth-img" :class="{ selected: selectedTeeth.includes(9) }" @click="toggleTooth(9)">
-              <div class="tooth-number">9</div>
-            </div>
-            <div class="tooth-wrapper">
-              <img src="../../assets/img/10.jpeg" alt="Tooth 10" class="tooth-img" :class="{ selected: selectedTeeth.includes(10) }" @click="toggleTooth(10)">
-              <div class="tooth-number">10</div>
-            </div>
-            <div class="tooth-wrapper">
-              <img src="../../assets/img/11.jpeg" alt="Tooth 11" class="tooth-img" :class="{ selected: selectedTeeth.includes(11) }" @click="toggleTooth(11)">
-              <div class="tooth-number">11</div>
-            </div>
-            <div class="tooth-wrapper">
-              <img src="../../assets/img/12.jpeg" alt="Tooth 12" class="tooth-img" :class="{ selected: selectedTeeth.includes(12) }" @click="toggleTooth(12)">
-              <div class="tooth-number">12</div>
-            </div>
-            <div class="tooth-wrapper">
-              <img src="../../assets/img/13.jpeg" alt="Tooth 13" class="tooth-img" :class="{ selected: selectedTeeth.includes(13) }" @click="toggleTooth(13)">
-              <div class="tooth-number">13</div>
-            </div>
-            <div class="tooth-wrapper">
-              <img src="../../assets/img/14.jpeg" alt="Tooth 14" class="tooth-img" :class="{ selected: selectedTeeth.includes(14) }" @click="toggleTooth(14)">
-              <div class="tooth-number">14</div>
-            </div>
-            <div class="tooth-wrapper">
-              <img src="../../assets/img/15.jpeg" alt="Tooth 15" class="tooth-img" :class="{ selected: selectedTeeth.includes(15) }" @click="toggleTooth(15)">
-              <div class="tooth-number">15</div>
-            </div>
-          </div>
-
-          <!-- Color -->
-          <label for="color">Color:</label>
-          <input type="text" id="color" v-model="orderData.color" required />
-          <span class="error" v-if="errors.color">{{ errors.color }}</span>
-
-          <!-- Lab Selection -->
-          <label for="labId">Lab:</label>
-          <select v-model="orderData.labId" id="labId">
-            <option value="" disabled>Select a lab</option>
-            <option v-for="lab in labs" :key="lab._id" :value="lab._id">
-              {{ lab.username }}
-            </option>
-          </select>
-          <span class="error" v-if="errors.labId">{{ errors.labId }}</span>
-
-          <!-- Notes -->
-          <label for="notes">Notes:</label>
-          <textarea
-              id="notes"
-              v-model="orderData.description"
-              @input="formatNote"
-          ></textarea>
-          <span class="error" v-if="errors.description">{{
-              errors.description
-            }}</span>
-
-          <!-- Price -->
-<!--          <label for="price">Price:</label>-->
-<!--          <input-->
-<!--              type="number"-->
-<!--              id="price"-->
-<!--              v-model="orderData.price"-->
-<!--              required-->
-<!--          />-->
-          <span class="error" v-if="errors.price">{{ errors.price }}</span>
-
-          <!-- Deadline -->
-          <label for="deadline">Deadline Date:</label>
-          <input
-              type="date"
-              id="deadline"
-              v-model="orderData.deadline"
-              required
-          />
-          <span class="error" v-if="errors.deadline">{{ errors.deadline }}</span>
-          <!-- Audio -->
-          <label for="audio">Audio Recording:</label>
-          <input
-              type="file"
-              id="audio"
-              accept="audio/*"
-              class="file-input"
-              @change="handleFileUpload($event, 'video')"
-          />
-          <span class="error" v-if="errors.video">{{ errors.video }}</span>
-
-          <!-- Images -->
-          <label for="photo">Images (up to 3):</label>
-          <input
-              type="file"
-              id="photo"
-              accept="image/*"
-              class="file-input"
-              multiple
-              @change="handleFileUpload($event, 'images')"
-          />
-          <span class="error" v-if="errors.images">{{ errors.images }}</span>
-
-          <!-- Submit Button -->
-          <button type="submit">Submit</button>
-        </fieldset>
-
-        <!-- Print Icon -->
-        <div class="print-icon" @click="printForm" title="Print as PDF">
-          <font-awesome-icon icon="print" />
-          <font-awesome-icon icon="file-pdf" /> <!-- Added PDF icon -->
+        <!-- Tooth Selection -->
+        <h2>اضغط على السن لاختياره</h2>
+        <div
+            id="tooth-description"
+            class="description"
+            :class="{ visible: selectedTeeth.length > 0 }"
+        >
+          لقد اخترت السن رقم: <span id="tooth-number">{{ selectedTeeth.join(", ") }}</span>
         </div>
-      </form>
-    </div>
 
-    <!-- Chat Icon -->
-    <div class="chat-icon" title="Chat with us">
-      <font-awesome-icon icon="comments" />
-    </div>
+        <!-- Upper Teeth (17-32) -->
+        <div class="teeth-container">
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/17.jpeg" alt="Tooth 17" class="tooth-img" :class="{ selected: selectedTeeth.includes(17) }" @click="toggleTooth(17)">
+            <div class="tooth-number">17</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/18.jpeg" alt="Tooth 18" class="tooth-img" :class="{ selected: selectedTeeth.includes(18) }" @click="toggleTooth(18)">
+            <div class="tooth-number">18</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/19.jpeg" alt="Tooth 19" class="tooth-img" :class="{ selected: selectedTeeth.includes(19) }" @click="toggleTooth(19)">
+            <div class="tooth-number">19</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/20.jpeg" alt="Tooth 20" class="tooth-img" :class="{ selected: selectedTeeth.includes(20) }" @click="toggleTooth(20)">
+            <div class="tooth-number">20</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/21.jpeg" alt="Tooth 21" class="tooth-img" :class="{ selected: selectedTeeth.includes(21) }" @click="toggleTooth(21)">
+            <div class="tooth-number">21</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/22.jpeg" alt="Tooth 22" class="tooth-img" :class="{ selected: selectedTeeth.includes(22) }" @click="toggleTooth(22)">
+            <div class="tooth-number">22</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/23.jpeg" alt="Tooth 23" class="tooth-img" :class="{ selected: selectedTeeth.includes(23) }" @click="toggleTooth(23)">
+            <div class="tooth-number">23</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/24.jpeg" alt="Tooth 24" class="tooth-img" :class="{ selected: selectedTeeth.includes(24) }" @click="toggleTooth(24)">
+            <div class="tooth-number">24</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/25.jpeg" alt="Tooth 25" class="tooth-img" :class="{ selected: selectedTeeth.includes(25) }" @click="toggleTooth(25)">
+            <div class="tooth-number">25</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/26.jpeg" alt="Tooth 26" class="tooth-img" :class="{ selected: selectedTeeth.includes(26) }" @click="toggleTooth(26)">
+            <div class="tooth-number">26</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/27.jpeg" alt="Tooth 27" class="tooth-img" :class="{ selected: selectedTeeth.includes(27) }" @click="toggleTooth(27)">
+            <div class="tooth-number">27</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/28.jpeg" alt="Tooth 28" class="tooth-img" :class="{ selected: selectedTeeth.includes(28) }" @click="toggleTooth(28)">
+            <div class="tooth-number">28</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/29.jpeg" alt="Tooth 29" class="tooth-img" :class="{ selected: selectedTeeth.includes(29) }" @click="toggleTooth(29)">
+            <div class="tooth-number">29</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/30.jpeg" alt="Tooth 30" class="tooth-img" :class="{ selected: selectedTeeth.includes(30) }" @click="toggleTooth(30)">
+            <div class="tooth-number">30</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/31.jpeg" alt="Tooth 31" class="tooth-img" :class="{ selected: selectedTeeth.includes(31) }" @click="toggleTooth(31)">
+            <div class="tooth-number">31</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/32.jpeg" alt="Tooth 32" class="tooth-img" :class="{ selected: selectedTeeth.includes(32) }" @click="toggleTooth(32)">
+            <div class="tooth-number">32</div>
+          </div>
+        </div>
+
+        <!-- Lower Teeth (1-15) -->
+        <div class="teeth-container">
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/1.jpeg" alt="Tooth 1" class="tooth-img" :class="{ selected: selectedTeeth.includes(1) }" @click="toggleTooth(1)">
+            <div class="tooth-number">1</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/2.jpeg" alt="Tooth 2" class="tooth-img" :class="{ selected: selectedTeeth.includes(2) }" @click="toggleTooth(2)">
+            <div class="tooth-number">2</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/3.jpeg" alt="Tooth 3" class="tooth-img" :class="{ selected: selectedTeeth.includes(3) }" @click="toggleTooth(3)">
+            <div class="tooth-number">3</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/4.jpeg" alt="Tooth 4" class="tooth-img" :class="{ selected: selectedTeeth.includes(4) }" @click="toggleTooth(4)">
+            <div class="tooth-number">4</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/5.jpeg" alt="Tooth 5" class="tooth-img" :class="{ selected: selectedTeeth.includes(5) }" @click="toggleTooth(5)">
+            <div class="tooth-number">5</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/6.jpeg" alt="Tooth 6" class="tooth-img" :class="{ selected: selectedTeeth.includes(6) }" @click="toggleTooth(6)">
+            <div class="tooth-number">6</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/7.jpeg" alt="Tooth 7" class="tooth-img" :class="{ selected: selectedTeeth.includes(7) }" @click="toggleTooth(7)">
+            <div class="tooth-number">7</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/8.jpeg" alt="Tooth 8" class="tooth-img" :class="{ selected: selectedTeeth.includes(8) }" @click="toggleTooth(8)">
+            <div class="tooth-number">8</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/9.jpeg" alt="Tooth 9" class="tooth-img" :class="{ selected: selectedTeeth.includes(9) }" @click="toggleTooth(9)">
+            <div class="tooth-number">9</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/10.jpeg" alt="Tooth 10" class="tooth-img" :class="{ selected: selectedTeeth.includes(10) }" @click="toggleTooth(10)">
+            <div class="tooth-number">10</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/11.jpeg" alt="Tooth 11" class="tooth-img" :class="{ selected: selectedTeeth.includes(11) }" @click="toggleTooth(11)">
+            <div class="tooth-number">11</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/12.jpeg" alt="Tooth 12" class="tooth-img" :class="{ selected: selectedTeeth.includes(12) }" @click="toggleTooth(12)">
+            <div class="tooth-number">12</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/13.jpeg" alt="Tooth 13" class="tooth-img" :class="{ selected: selectedTeeth.includes(13) }" @click="toggleTooth(13)">
+            <div class="tooth-number">13</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/14.jpeg" alt="Tooth 14" class="tooth-img" :class="{ selected: selectedTeeth.includes(14) }" @click="toggleTooth(14)">
+            <div class="tooth-number">14</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/15.jpeg" alt="Tooth 15" class="tooth-img" :class="{ selected: selectedTeeth.includes(15) }" @click="toggleTooth(15)">
+            <div class="tooth-number">15</div>
+          </div>
+        </div>
+
+        <!-- Color -->
+        <label for="color">Color:</label>
+        <input type="text" id="color" v-model="orderData.color" required />
+        <span class="error" v-if="errors.color">{{ errors.color }}</span>
+
+        <!-- Notes -->
+        <label for="notes">Notes:</label>
+        <textarea
+            id="notes"
+            v-model="orderData.description"
+            @input="formatNote"
+        ></textarea>
+        <span class="error" v-if="errors.description">{{ errors.description }}</span>
+
+        <!-- Price (auto-calculated) -->
+        <label>Price:</label>
+        <input
+            type="text"
+            :value="formatCurrency(calculatedPrice)"
+            readonly
+        />
+
+        <!-- Deadline -->
+        <label for="deadline">Deadline Date:</label>
+        <input
+            type="date"
+            id="deadline"
+            v-model="orderData.deadline"
+            required
+        />
+        <span class="error" v-if="errors.deadline">{{ errors.deadline }}</span>
+
+        <!-- Audio -->
+        <label for="audio">Audio Recording:</label>
+        <input
+            type="file"
+            id="audio"
+            accept="audio/*"
+            class="file-input"
+            @change="handleFileUpload($event, 'video')"
+        />
+        <span class="error" v-if="errors.video">{{ errors.video }}</span>
+
+        <!-- Images -->
+        <label for="photo">Images (up to 3):</label>
+        <input
+            type="file"
+            id="photo"
+            accept="image/*"
+            class="file-input"
+            multiple
+            @change="handleFileUpload($event, 'images')"
+        />
+        <span class="error" v-if="errors.images">{{ errors.images }}</span>
+
+        <!-- Submit Button -->
+        <button type="submit">Submit</button>
+      </fieldset>
+
+      <!-- Print Icon -->
+      <div class="print-icon" @click="printForm" title="Print as PDF">
+        <font-awesome-icon icon="print" />
+        <font-awesome-icon icon="file-pdf" />
+      </div>
+    </form>
+  </div>
+
+  <!-- Chat Icon -->
+  <div class="chat-icon" title="Chat with us">
+    <font-awesome-icon icon="comments" />
+  </div>
 </template>
 
 <script>
 import axios from "axios";
 import html2pdf from "html2pdf.js";
 import DoctorNavbar from "@/components/navbars/doctorNavbar.vue";
+
 export default {
   name: "NewOrder",
   data() {
@@ -303,6 +302,7 @@ export default {
       labs: [],
       selectedTeeth: [],
       orderId: null,
+      availableTeethTypes: {},
       orderData: {
         patientName: "",
         age: "",
@@ -317,7 +317,7 @@ export default {
         images: [],
         video: null,
         file: null,
-        prova: true, // Default to Provisional (true)
+        prova: true,
       },
       baseUrl: "http://localhost:3000",
       errors: {},
@@ -328,23 +328,87 @@ export default {
   components: {
     DoctorNavbar
   },
+  computed: {
+    calculatedPrice() {
+      if (this.orderData.type && this.availableTeethTypes[this.orderData.type]) {
+        // Get the base price for the selected teeth type
+        const basePrice = this.availableTeethTypes[this.orderData.type];
+        // Get the number of teeth (convert to number, default to 0)
+        const teethCount = parseInt(this.orderData.teethNo) || 0;
+        // Calculate total price: base price × number of teeth
+        return basePrice * teethCount;
+      }
+      return 0;
+    }
+  },
   created() {
     this.fetchLabs();
   },
   methods: {
     async fetchLabs() {
       try {
+        const token = localStorage.getItem("token");
         const response = await axios.get(`${this.baseUrl}/orders/getMyLabs`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
         this.labs = response.data.labs.myLabs;
-        console.log(this.labs[0].username);
+        // Store the doctorId from the response if available
+        if (response.data.labs.contract) {
+          this.doctorId = response.data.labs.contract.doctorId;
+        }
       } catch (error) {
         console.error("Error fetching labs:", error);
-        this.showError("Your not subscribe as a doctor");
+        this.showError("Failed to load labs. Please try again.");
       }
+    },
+
+
+    updateTeethTypes() {
+      // Reset teeth selection when changing labs
+      this.selectedTeeth = [];
+      this.orderData.teethNo = "0";
+
+      // Find the lab selected by the user
+      const selectedLab = this.labs.find(lab => lab._id === this.orderData.labId);
+
+      if (selectedLab) {
+        // Get doctorId from localStorage or component data
+        const doctorId = this.doctorId || JSON.parse(localStorage.getItem("doctor"))?.id;
+
+        if (!doctorId) {
+          this.showError("Doctor information not found. Please login again.");
+          return;
+        }
+
+        // Find the contract for the current doctor in the selected lab
+        const contract = selectedLab.contracts.find(
+            c => c.doctorId?.toString() === doctorId.toString()
+        );
+
+        if (contract && contract.teethTypes) {
+          this.availableTeethTypes = contract.teethTypes;
+          // Auto-select the first teeth type if available
+          const firstType = Object.keys(contract.teethTypes)[0];
+          if (firstType) {
+            this.orderData.type = firstType;
+          }
+        } else {
+          this.availableTeethTypes = {};
+          this.orderData.type = "";
+          this.showError("No contract found with this lab for the current doctor.");
+        }
+      } else {
+        this.availableTeethTypes = {};
+        this.orderData.type = "";
+        this.showError("Selected lab not found.");
+      }
+    },
+
+    formatCurrency(value) {
+      return new Intl.NumberFormat('en-JO', {
+        style: 'currency',
+        currency: 'JOD'
+      }).format(value || 0);
     },
 
     formatNote() {
@@ -364,11 +428,15 @@ export default {
 
     toggleTooth(toothNumber) {
       if (this.selectedTeeth.includes(toothNumber)) {
-        this.selectedTeeth = this.selectedTeeth.filter((n) => n !== toothNumber);
+        this.selectedTeeth = this.selectedTeeth.filter(n => n !== toothNumber);
       } else {
         this.selectedTeeth.push(toothNumber);
       }
+      // Update teeth count
       this.orderData.teethNo = this.selectedTeeth.length.toString();
+
+      // Force price recalculation by triggering a reactive update
+      // This is handled automatically by Vue's reactivity system
     },
 
     validateForm() {
@@ -382,12 +450,11 @@ export default {
         "teethNo",
         "color",
         "type",
-        "description",
         "deadline",
         "labId",
       ];
 
-      requiredFields.forEach((field) => {
+      requiredFields.forEach(field => {
         if (!this.orderData[field]) {
           this.errors[field] = `${this.getFieldLabel(field)} is required`;
           isValid = false;
@@ -404,11 +471,6 @@ export default {
         isValid = false;
       }
 
-      if (this.orderData.price && this.orderData.price < 0) {
-        this.errors.price = "Please enter a valid price";
-        isValid = false;
-      }
-
       return isValid;
     },
 
@@ -421,7 +483,6 @@ export default {
         color: "Color",
         type: "Type",
         description: "Requirements",
-        price: "Price",
         deadline: "Deadline Date",
         labId: "Lab",
       };
@@ -442,8 +503,11 @@ export default {
           this.orderData.description = teethNote + (this.orderData.description || '');
         }
 
+        // Set the price from the selected type
+        this.orderData.price = this.calculatedPrice;
+
         // Append all order data to FormData
-        Object.keys(this.orderData).forEach((key) => {
+        Object.keys(this.orderData).forEach(key => {
           if (key === "images") {
             this.orderData.images.forEach((image, index) => {
               formData.append(`image${index}`, image);
@@ -463,9 +527,9 @@ export default {
               },
             }
         );
-        console.log(response);
+        console.log(response.data);
 
-        // Generate Order ID (e.g., AB12)
+        // Generate Order ID
         const randomLetters =
             String.fromCharCode(65 + Math.floor(Math.random() * 26)) +
             String.fromCharCode(65 + Math.floor(Math.random() * 26));
@@ -478,6 +542,7 @@ export default {
         this.handleApiError(error);
       }
     },
+
     handleApiError(error) {
       if (error.response) {
         switch (error.response.status) {
@@ -545,6 +610,9 @@ export default {
 };
 </script>
 
+<style scoped>
+/* Your existing styles remain the same */
+</style>
 <style scoped>
 body {
   font-family: Arial, sans-serif;

@@ -10,6 +10,7 @@ import myDoctors from "@/views/lab/myDoctors.vue";
 import addDoctor from "@/views/lab/addDoctor.vue";
 import contract from "@/views/lab/contractView.vue";
 import deliverMain from "@/views/Delivery/pageDelivery.vue";
+import BillingDashboard from "@/views/lab/accountsView.vue";
 const routes = [
   {
     path:'/',
@@ -69,6 +70,11 @@ const routes = [
     path: '/deliver-main',
     name: 'deliverMain',
     component: deliverMain,
+  },
+  {
+    path: '/accounts',
+    name: 'BillingDashboard',
+    component: BillingDashboard,
   }
 ]
 

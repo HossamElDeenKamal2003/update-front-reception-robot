@@ -72,29 +72,133 @@
 
         <!-- Upper Teeth (17-32) -->
         <div class="teeth-container">
-          <div v-for="tooth in upperTeeth" :key="tooth" class="tooth-wrapper">
-            <img
-                :src="`../../assets/img/${tooth}.jpeg`"
-                :alt="`Tooth ${tooth}`"
-                class="tooth-img"
-                :class="{ selected: selectedTeeth.includes(tooth) }"
-                @click="toggleTooth(tooth)"
-            />
-            <div class="tooth-number">{{ tooth }}</div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/17.jpeg" alt="Tooth 17" class="tooth-img" :class="{ selected: selectedTeeth.includes(17) }" @click="toggleTooth(17)">
+            <div class="tooth-number">17</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/18.jpeg" alt="Tooth 18" class="tooth-img" :class="{ selected: selectedTeeth.includes(18) }" @click="toggleTooth(18)">
+            <div class="tooth-number">18</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/19.jpeg" alt="Tooth 19" class="tooth-img" :class="{ selected: selectedTeeth.includes(19) }" @click="toggleTooth(19)">
+            <div class="tooth-number">19</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/20.jpeg" alt="Tooth 20" class="tooth-img" :class="{ selected: selectedTeeth.includes(20) }" @click="toggleTooth(20)">
+            <div class="tooth-number">20</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/21.jpeg" alt="Tooth 21" class="tooth-img" :class="{ selected: selectedTeeth.includes(21) }" @click="toggleTooth(21)">
+            <div class="tooth-number">21</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/22.jpeg" alt="Tooth 22" class="tooth-img" :class="{ selected: selectedTeeth.includes(22) }" @click="toggleTooth(22)">
+            <div class="tooth-number">22</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/23.jpeg" alt="Tooth 23" class="tooth-img" :class="{ selected: selectedTeeth.includes(23) }" @click="toggleTooth(23)">
+            <div class="tooth-number">23</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/24.jpeg" alt="Tooth 24" class="tooth-img" :class="{ selected: selectedTeeth.includes(24) }" @click="toggleTooth(24)">
+            <div class="tooth-number">24</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/25.jpeg" alt="Tooth 25" class="tooth-img" :class="{ selected: selectedTeeth.includes(25) }" @click="toggleTooth(25)">
+            <div class="tooth-number">25</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/26.jpeg" alt="Tooth 26" class="tooth-img" :class="{ selected: selectedTeeth.includes(26) }" @click="toggleTooth(26)">
+            <div class="tooth-number">26</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/27.jpeg" alt="Tooth 27" class="tooth-img" :class="{ selected: selectedTeeth.includes(27) }" @click="toggleTooth(27)">
+            <div class="tooth-number">27</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/28.jpeg" alt="Tooth 28" class="tooth-img" :class="{ selected: selectedTeeth.includes(28) }" @click="toggleTooth(28)">
+            <div class="tooth-number">28</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/29.jpeg" alt="Tooth 29" class="tooth-img" :class="{ selected: selectedTeeth.includes(29) }" @click="toggleTooth(29)">
+            <div class="tooth-number">29</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/30.jpeg" alt="Tooth 30" class="tooth-img" :class="{ selected: selectedTeeth.includes(30) }" @click="toggleTooth(30)">
+            <div class="tooth-number">30</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/31.jpeg" alt="Tooth 31" class="tooth-img" :class="{ selected: selectedTeeth.includes(31) }" @click="toggleTooth(31)">
+            <div class="tooth-number">31</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/32.jpeg" alt="Tooth 32" class="tooth-img" :class="{ selected: selectedTeeth.includes(32) }" @click="toggleTooth(32)">
+            <div class="tooth-number">32</div>
           </div>
         </div>
 
         <!-- Lower Teeth (1-15) -->
         <div class="teeth-container">
-          <div v-for="tooth in lowerTeeth" :key="tooth" class="tooth-wrapper">
-            <img
-                :src="`../../assets/img/${tooth}.jpeg`"
-                :alt="`Tooth ${tooth}`"
-                class="tooth-img"
-                :class="{ selected: selectedTeeth.includes(tooth) }"
-                @click="toggleTooth(tooth)"
-            />
-            <div class="tooth-number">{{ tooth }}</div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/1.jpeg" alt="Tooth 1" class="tooth-img" :class="{ selected: selectedTeeth.includes(1) }" @click="toggleTooth(1)">
+            <div class="tooth-number">1</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/2.jpeg" alt="Tooth 2" class="tooth-img" :class="{ selected: selectedTeeth.includes(2) }" @click="toggleTooth(2)">
+            <div class="tooth-number">2</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/3.jpeg" alt="Tooth 3" class="tooth-img" :class="{ selected: selectedTeeth.includes(3) }" @click="toggleTooth(3)">
+            <div class="tooth-number">3</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/4.jpeg" alt="Tooth 4" class="tooth-img" :class="{ selected: selectedTeeth.includes(4) }" @click="toggleTooth(4)">
+            <div class="tooth-number">4</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/5.jpeg" alt="Tooth 5" class="tooth-img" :class="{ selected: selectedTeeth.includes(5) }" @click="toggleTooth(5)">
+            <div class="tooth-number">5</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/6.jpeg" alt="Tooth 6" class="tooth-img" :class="{ selected: selectedTeeth.includes(6) }" @click="toggleTooth(6)">
+            <div class="tooth-number">6</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/7.jpeg" alt="Tooth 7" class="tooth-img" :class="{ selected: selectedTeeth.includes(7) }" @click="toggleTooth(7)">
+            <div class="tooth-number">7</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/8.jpeg" alt="Tooth 8" class="tooth-img" :class="{ selected: selectedTeeth.includes(8) }" @click="toggleTooth(8)">
+            <div class="tooth-number">8</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/9.jpeg" alt="Tooth 9" class="tooth-img" :class="{ selected: selectedTeeth.includes(9) }" @click="toggleTooth(9)">
+            <div class="tooth-number">9</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/10.jpeg" alt="Tooth 10" class="tooth-img" :class="{ selected: selectedTeeth.includes(10) }" @click="toggleTooth(10)">
+            <div class="tooth-number">10</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/11.jpeg" alt="Tooth 11" class="tooth-img" :class="{ selected: selectedTeeth.includes(11) }" @click="toggleTooth(11)">
+            <div class="tooth-number">11</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/12.jpeg" alt="Tooth 12" class="tooth-img" :class="{ selected: selectedTeeth.includes(12) }" @click="toggleTooth(12)">
+            <div class="tooth-number">12</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/13.jpeg" alt="Tooth 13" class="tooth-img" :class="{ selected: selectedTeeth.includes(13) }" @click="toggleTooth(13)">
+            <div class="tooth-number">13</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/14.jpeg" alt="Tooth 14" class="tooth-img" :class="{ selected: selectedTeeth.includes(14) }" @click="toggleTooth(14)">
+            <div class="tooth-number">14</div>
+          </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/15.jpeg" alt="Tooth 15" class="tooth-img" :class="{ selected: selectedTeeth.includes(15) }" @click="toggleTooth(15)">
+            <div class="tooth-number">15</div>
           </div>
         </div>
 

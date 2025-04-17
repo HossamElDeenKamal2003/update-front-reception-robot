@@ -53,10 +53,12 @@
           <h3>Order #{{ order.UID }}</h3>
           <p><strong>Patient Name:</strong> {{ order.patientName }}</p>
           <p><strong>Status:</strong> {{ order.status }}</p>
-          <p><strong>Doctor:</strong> {{ order.doctor }}</p>
+          <p><strong>Price:</strong> {{ order.price }}</p>
+          <p><strong>Paid:</strong> {{ order.paied }}</p>
+          <p><strong>rest:</strong> {{ order.rest }}</p>
           <p><strong>Last Updated:</strong> {{ formatDate(order.updatedAt) }}</p>
           <router-link
-              :to="{ name: 'showOrderlab', params: { id: order._id } }"
+              :to="{ name: 'showOrder', params: { id: order._id } }"
               class="view-order-btn"
           >
             View Order Details

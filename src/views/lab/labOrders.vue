@@ -11,7 +11,7 @@
               v-model="searchTerm"
               @input="handleSearch"
               placeholder="Search orders..."
-          >
+          />
           <select v-model="searchField">
             <option value="all">All Fields</option>
             <option value="UID">Order ID</option>
@@ -22,9 +22,9 @@
         </div>
 
         <div class="date-filter">
-          <input type="date" v-model="startDate" @change="applyFilters">
+          <input type="date" v-model="startDate" @change="applyFilters" />
           <span>to</span>
-          <input type="date" v-model="endDate" @change="applyFilters">
+          <input type="date" v-model="endDate" @change="applyFilters" />
           <button @click="clearDateFilter">Clear Dates</button>
         </div>
 
@@ -53,7 +53,38 @@
           <h3>Order #{{ order.UID }}</h3>
           <p><strong>Patient Name:</strong> {{ order.patientName }}</p>
           <p><strong>Status:</strong> {{ order.status }}</p>
-          <p><strong>Doctor:</strong> {{ order.doctorId?.username || 'N/A' }}</p>
+          <p><strong>Doctor:</strong> {{ order.doctorId.username }}</p>
+          <p><strong>Price:</strong> {{ formatCurrency(order.price) }}</p>
+
+          <div class="price-inputs">
+            <div class="input-group">
+              <label>Paid:</label>
+              <input
+                  type="number"
+                  v-model.number="order.paid"
+                  placeholder="Enter paid amount"
+                  :disabled="processingOrder === order._id"
+                  @keyup.enter="updatePrice(order)"
+                  min="0"
+                  :max="order.price"
+                  step="0.01"
+              />
+              <button
+                  class="update-btn"
+                  @click="updatePrice(order)"
+                  :disabled="processingOrder === order._id || !isValidPayment(order)"
+              >
+                <span v-if="processingOrder === order._id" class="btn-spinner"></span>
+                <span v-else>✓</span>
+              </button>
+            </div>
+
+            <div class="rest-display">
+              <label>Rest:</label>
+              <span class="rest-value">{{ formatCurrency(calculateRest(order)) }}</span>
+            </div>
+          </div>
+
           <p><strong>Last Updated:</strong> {{ formatDate(order.updatedAt) }}</p>
 
           <div class="card-actions">
@@ -65,10 +96,9 @@
             </router-link>
 
             <button
-
                 @click="markOrderAsReady(order._id)"
                 class="mark-ready-btn"
-                :disabled="processingOrder === order._id"
+
             >
               <span v-if="processingOrder === order._id" class="btn-spinner"></span>
               {{ processingOrder === order._id ? 'Processing...' : 'Mark as Lab Ready' }}
@@ -78,17 +108,11 @@
       </div>
 
       <div v-if="totalPages > 1" class="pagination">
-        <button
-            @click="currentPage--"
-            :disabled="currentPage === 1"
-        >
+        <button @click="prevPage" :disabled="currentPage === 1">
           Previous
         </button>
         <span>Page {{ currentPage }} of {{ totalPages }}</span>
-        <button
-            @click="currentPage++"
-            :disabled="currentPage === totalPages"
-        >
+        <button @click="nextPage" :disabled="currentPage === totalPages">
           Next
         </button>
       </div>
@@ -131,7 +155,7 @@ export default {
       processingOrder: null,
       filters: [
         { label: "All", value: "all" },
-        { label: "Underway", value: "DocReady" },
+        { label: "Underway", value: "lab received" },
         { label: "Ready", value: "lab ready" },
         { label: "Completed", value: "end" },
       ],
@@ -149,6 +173,14 @@ export default {
       return this.filteredOrders.slice(start, start + this.itemsPerPage);
     },
   },
+  watch: {
+    searchTerm() {
+      this.debouncedSearch();
+    },
+  },
+  created() {
+    this.debouncedSearch = this.debounce(this.applyFilters, 300);
+  },
   mounted() {
     this.isMounted = true;
     if (!this.isAuthenticated) {
@@ -164,14 +196,45 @@ export default {
     }
   },
   methods: {
+    debounce(fn, delay) {
+      let timeoutId;
+      return function(...args) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => fn.apply(this, args), delay);
+      };
+    },
     formatDate(date) {
       return date ? format(new Date(date), "MMM dd, yyyy HH:mm") : "";
+    },
+    formatCurrency(amount) {
+      if (typeof amount !== 'number') return 'N/A';
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD'
+      }).format(amount);
     },
     statusClass(status) {
       return `status-${status.toLowerCase().replace(/[()]/g, '').replace(/\s+/g, '-')}`;
     },
+    calculateRest(order) {
+      if (typeof order.price !== 'number' || typeof order.paid !== 'number') {
+        return 0;
+      }
+      return Math.max(0, order.price - order.paid);
+    },
+    isValidPayment(order) {
+      return typeof order.paid === 'number' &&
+          order.paid >= 0 &&
+          order.paid <= order.price;
+    },
     canMarkAsReady(status) {
       return status.includes('DocReady') || status.includes('Underway');
+    },
+    prevPage() {
+      if (this.currentPage > 1) this.currentPage--;
+    },
+    nextPage() {
+      if (this.currentPage < this.totalPages) this.currentPage++;
     },
 
     async fetchOrders() {
@@ -194,7 +257,12 @@ export default {
         });
 
         if (this.isMounted) {
-          this.orders = data.orders || data;
+          this.orders = Array.isArray(data.orders) ? data.orders : Array.isArray(data) ? data : [];
+          this.orders = this.orders.map(order => ({
+            ...order,
+            paid: order.paid || order.paied || 0,
+            price: order.price || 0
+          }));
           this.filteredOrders = [...this.orders];
         }
       } catch (error) {
@@ -207,6 +275,48 @@ export default {
         if (this.isMounted) {
           this.loading = false;
         }
+      }
+    },
+
+    async updatePrice(order) {
+      if (!this.isValidPayment(order) || this.processingOrder) return;
+
+      this.processingOrder = order._id;
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.patch(
+            `${this.baseUrl}/update-prices`,
+            {
+              orderId: order._id,
+              paied: Number(order.paid),
+            },
+            {
+              headers: { Authorization: `Bearer ${token}` }
+            }
+        );
+
+        if (response.data.status === 200) {
+          toast.success('Price updated successfully');
+          const updatedOrder = {
+            ...order,
+            paid: Number(order.paid),
+            updatedAt: new Date().toISOString()
+          };
+
+          const orderIndex = this.orders.findIndex(o => o._id === order._id);
+          if (orderIndex !== -1) {
+            this.orders.splice(orderIndex, 1, updatedOrder);
+            this.filteredOrders = [...this.orders];
+          }
+        } else {
+          throw new Error(response.data.message || 'Failed to update price');
+        }
+      } catch (error) {
+        console.error('Error updating price:', error);
+        toast.error(error.response?.data?.message || error.message || 'Failed to update price');
+        await this.fetchOrders();
+      } finally {
+        this.processingOrder = null;
       }
     },
 
@@ -224,7 +334,7 @@ export default {
 
         if (response.data.status === 200) {
           toast.success('Order marked as Lab Ready');
-          this.fetchOrders();
+          await this.fetchOrders();
         } else {
           throw new Error(response.data.message || 'Failed to update order');
         }
@@ -259,11 +369,11 @@ export default {
         filtered = filtered.filter((order) => {
           if (this.searchField === 'all') {
             return (
-                (order.UID?.toLowerCase().includes(term)) ||
-                (order.patientName?.toLowerCase().includes(term)) ||
-                (order.status?.toLowerCase().includes(term)) ||
-                (order.doctorId?.username?.toLowerCase().includes(term))
-            );
+                order.UID?.toLowerCase().includes(term) ||
+                order.patientName?.toLowerCase().includes(term) ||
+                order.status?.toLowerCase().includes(term) ||
+                order.doctorId?.username?.toLowerCase().includes(term)
+            ); // Added semicolon
           }
           const fieldValue = order[this.searchField]?.toLowerCase();
           return fieldValue?.includes(term);
@@ -336,11 +446,13 @@ h2 {
   display: flex;
   flex-wrap: wrap;
   gap: 15px;
+  align-items: center;
 }
 
 .search-box {
   display: flex;
   gap: 10px;
+  align-items: center;
 }
 
 .search-box input {
@@ -348,6 +460,12 @@ h2 {
   border: 1px solid #ddd;
   border-radius: 4px;
   min-width: 250px;
+}
+
+.search-box select {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
 }
 
 .date-filter {
@@ -362,6 +480,14 @@ h2 {
   border-radius: 4px;
 }
 
+.date-filter button {
+  padding: 8px 12px;
+  background-color: #f8f9fa;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
 .status-filters {
   display: flex;
   gap: 10px;
@@ -373,6 +499,7 @@ h2 {
   border-radius: 4px;
   background: white;
   cursor: pointer;
+  transition: all 0.2s;
 }
 
 .status-filters button.active {
@@ -408,6 +535,73 @@ h2 {
 
 .card p {
   margin: 8px 0;
+}
+
+.price-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin: 15px 0;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.input-group label {
+  min-width: 50px;
+}
+
+.input-group input {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  max-width: 120px;
+}
+
+.update-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 4px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.update-btn:hover:not(:disabled) {
+  background-color: #218838;
+}
+
+.update-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: #cccccc;
+}
+
+.rest-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rest-display label {
+  min-width: 50px;
+}
+
+.rest-value {
+  padding: 8px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  min-width: 100px;
+  display: inline-block;
 }
 
 .card-actions {
@@ -465,7 +659,6 @@ h2 {
   to { transform: rotate(360deg); }
 }
 
-/* Status classes */
 .status-docready {
   border-left: 4px solid #ffc107;
 }
@@ -496,6 +689,11 @@ h2 {
   border-radius: 4px;
   background: white;
   cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pagination button:hover:not(:disabled) {
+  background-color: #f0f0f0;
 }
 
 .pagination button:disabled {
@@ -530,6 +728,12 @@ h2 {
   justify-content: center;
   align-items: center;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.chat-icon:hover {
+  transform: scale(1.1);
 }
 
 .chat-icon a {
