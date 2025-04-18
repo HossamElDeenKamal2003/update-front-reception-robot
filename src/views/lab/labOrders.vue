@@ -3,7 +3,11 @@
     <LabNavbar />
     <div class="content">
       <h2>Orders</h2>
-
+      <audio
+          ref="notificationSound"
+          :src="require('../../assets/ring.mp3')"
+          preload="auto"
+      ></audio>
       <div class="controls">
         <div class="search-box">
           <input
@@ -130,7 +134,7 @@ import axios from "axios";
 import { format } from "date-fns";
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
-
+import io from 'socket.io-client';
 export default {
   name: "LabOrders",
   components: {
@@ -140,6 +144,8 @@ export default {
     return {
       baseUrl: "http://localhost:3000/labdash",
       orders: [],
+      socket: null,
+      labId: null, //
       filteredOrders: [],
       loading: false,
       error: null,
@@ -196,6 +202,83 @@ export default {
     }
   },
   methods: {
+    initSocket() {
+      if (!this.labId) return;
+
+      // Disconnect existing socket if any
+      if (this.socket) {
+        this.socket.disconnect();
+      }
+
+      // Connect to Socket.IO server with query parameter
+      this.socket = io('http://localhost:3000', {
+        query: {
+          labId: this.labId
+        }
+      });
+
+      // Listen for lab-specific orders
+      this.socket.on(`get-orders/${this.labId}`, (data) => {
+        this.handleNewOrder(data.orders);
+      });
+
+      // General error handling
+      this.socket.on('connect_error', (error) => {
+        console.error('Socket connection error:', error);
+        toast.error('Connection to live updates failed. Please refresh the page.');
+      });
+
+      // Reconnect logic
+      this.socket.on('reconnect', (attempt) => {
+        console.log(`Reconnected after ${attempt} attempts`);
+        toast.info('Reconnected to live updates');
+      });
+    },
+
+
+    handleNewOrder(newOrder) {
+      // Play notification sound
+      this.playNotificationSound();
+
+      // Show toast notification
+      toast.info(`New order received: #${newOrder.UID}`, {
+        position: 'top-right',
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+
+      // Add the new order to the beginning of the orders array
+      this.orders.unshift({
+        ...newOrder,
+        paid: newOrder.paid || newOrder.paied || 0,
+        price: newOrder.price || 0
+      });
+
+      // Update filtered orders
+      this.filteredOrders = [...this.orders];
+
+      // If on first page, refresh the view
+      if (this.currentPage === 1) {
+        this.applyFilters();
+      }
+    },
+
+    playNotificationSound() {
+      try {
+        const sound = this.$refs.notificationSound;
+        if (sound) {
+          sound.currentTime = 0; // Rewind to start
+          sound.play().catch(e => console.log('Audio play failed:', e));
+        }
+      } catch (e) {
+        console.error('Error playing notification sound:', e);
+      }
+    },
+
     debounce(fn, delay) {
       let timeoutId;
       return function(...args) {
@@ -243,17 +326,10 @@ export default {
       this.loading = true;
       this.error = null;
 
-      if (this.cancelToken) {
-        this.cancelToken.cancel("New request initiated");
-      }
-
-      this.cancelToken = axios.CancelToken.source();
-      const token = localStorage.getItem("token");
-
       try {
+        const token = localStorage.getItem("token");
         const { data } = await axios.get(`${this.baseUrl}/get-orders`, {
-          headers: { Authorization: `Bearer ${token}` },
-          cancelToken: this.cancelToken.token
+          headers: { Authorization: `Bearer ${token}` }
         });
 
         if (this.isMounted) {
@@ -264,13 +340,16 @@ export default {
             price: order.price || 0
           }));
           this.filteredOrders = [...this.orders];
+
+          // Get labId from the first order (assuming all orders belong to the same lab)
+          if (this.orders.length > 0 && this.orders[0].labId) {
+            this.labId = this.orders[0].labId;
+            // localStorage.setItem('labId', this.labId);
+            this.initSocket(); // Initialize socket after getting labId
+          }
         }
       } catch (error) {
-        if (axios.isCancel(error)) {
-          console.log("Request canceled:", error.message);
-        } else if (this.isMounted) {
-          this.handleError(error);
-        }
+        this.handleError(error);
       } finally {
         if (this.isMounted) {
           this.loading = false;

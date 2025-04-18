@@ -16,7 +16,7 @@
       </template>
       <template v-else>
         <a href="/login" class="login">Login</a>
-        <a href="/signup" class="signup">Sign Up</a>
+        <a href="/register" class="signup">Sign Up</a>
       </template>
     </div>
   </nav>

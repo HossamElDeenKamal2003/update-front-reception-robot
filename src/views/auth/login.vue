@@ -58,7 +58,7 @@
 
       <div class="form-footer">
         <a href="#" class="forgot-password">Forgot password?</a>
-        <span>Don't have an account? <a href="#" class="signup-link">Sign up</a></span>
+        <span>Don't have an account? <a href="/register" class="signup-link">Sign up</a></span>
       </div>
     </form>
   </div>

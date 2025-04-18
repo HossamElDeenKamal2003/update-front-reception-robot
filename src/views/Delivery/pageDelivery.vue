@@ -48,9 +48,26 @@
         </div>
 
         <div class="card-body">
-          <p><strong>order direction:</strong> {{ getOrderType(order.status) }}</p>
-          <p><strong>Location:</strong> {{ order.address || 'Not specified' }}</p>
-          <p v-if="order.patient"><strong>Patient:</strong> {{ order.patient.name }}</p>
+          <p><strong>Order direction:</strong> {{ getOrderType(order.status) }}</p>
+
+          <!-- Doctor Information -->
+          <div v-if="order.doctorId" class="info-section">
+            <h4>Doctor Information:</h4>
+            <p><strong>Name:</strong> {{ order.doctorId.username }}</p>
+            <p><strong>Phone:</strong> {{ order.doctorId.phoneNumber }}</p>
+            <p><strong>Address:</strong> {{ order.doctorId.address }}</p>
+            <p><strong>Building:</strong> {{ order.doctorId.buildNo }}, Floor: {{ order.doctorId.floorNo }}</p>
+          </div>
+
+          <!-- Lab Information -->
+          <div v-if="order.labId" class="info-section">
+            <h4>Lab Information:</h4>
+            <p><strong>Name:</strong> {{ order.labId.username }}</p>
+            <p><strong>Phone:</strong> {{ order.labId.phoneNumber }}</p>
+            <p><strong>Address:</strong> {{ order.labId.address }}</p>
+            <p><strong>Building:</strong> {{ order.labId.buildNo }}, Floor: {{ order.labId.floorNo }}</p>
+          </div>
+
           <p><strong>Created:</strong> {{ formatDate(order.createdAt) }}</p>
         </div>
 
@@ -210,15 +227,18 @@ export default {
     },
 
     handleOrderClick(order) {
-      if (order.latitude && order.longitude) {
-        this.goToMap(order.latitude, order.longitude);
+      // Try to use doctor's address first, then lab's address
+      const location = order.doctorId || order.labId;
+      if (location && location.address) {
+        this.openMap(location.address);
       } else {
-        toast.warning('Location coordinates not available for this order');
+        toast.warning('Location address not available for this order');
       }
     },
 
-    goToMap(lat, lng) {
-      window.open(`https://www.google.com/maps?q=${lat},${lng}`, '_blank');
+    openMap(address) {
+      const encodedAddress = encodeURIComponent(address);
+      window.open(`https://www.google.com/maps/search/?api=1&query=${encodedAddress}`, '_blank');
     },
 
     openChat() {
@@ -259,6 +279,27 @@ export default {
 </script>
 
 <style scoped>
+/* Previous styles remain the same, add these new ones: */
+
+.info-section {
+  margin: 10px 0;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-radius: 5px;
+}
+
+.info-section h4 {
+  margin: 0 0 8px 0;
+  color: #2c3e50;
+  font-size: 14px;
+}
+
+.info-section p {
+  margin: 4px 0;
+  font-size: 13px;
+}
+
+/* Keep all other existing styles */
 .content {
   margin-top: 70px;
   padding: 20px;
@@ -474,8 +515,6 @@ export default {
     padding: 15px;
   }
 }
-
-/* Existing styles remain the same, add these new ones: */
 
 .tabs {
   display: flex;
