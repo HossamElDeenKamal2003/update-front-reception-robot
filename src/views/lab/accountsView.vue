@@ -135,7 +135,7 @@ export default {
       error: null,
       startDate: '',
       endDate: '',
-      baseUrl: "http://localhost:3000/labdash"
+      baseUrl: "https://rr-5d46.onrender.com/labdash"
     };
   },
   computed: {

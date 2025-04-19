@@ -142,7 +142,7 @@ export default {
   },
   data() {
     return {
-      baseUrl: "http://localhost:3000/labdash",
+      baseUrl: "https://rr-5d46.onrender.com/labdash",
       orders: [],
       socket: null,
       labId: null, //
@@ -211,7 +211,7 @@ export default {
       }
 
       // Connect to Socket.IO server with query parameter
-      this.socket = io('http://localhost:3000', {
+      this.socket = io('https://rr-5d46.onrender.com/', {
         query: {
           labId: this.labId
         }

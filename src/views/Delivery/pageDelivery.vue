@@ -140,8 +140,8 @@ export default {
       this.error = null;
       try {
         const endpoint = this.activeTab === 'available'
-            ? 'http://localhost:3000/del/orders'
-            : 'http://localhost:3000/del/myOrders';
+            ? 'https://rr-5d46.onrender.com/del/orders'
+            : 'https://rr-5d46.onrender.com/del/myOrders';
 
         const response = await axios.get(endpoint, {
           headers: {
@@ -170,7 +170,7 @@ export default {
       this.processingOrder = orderId;
       try {
         const response = await axios.patch(
-            `http://localhost:3000/del/orders/${orderId}/take`,
+            `https://rr-5d46.onrender.com/del/orders/${orderId}/take`,
             {},
             {
               headers: {
@@ -198,7 +198,7 @@ export default {
       this.processingOrder = orderId;
       try {
         const response = await axios.post(
-            `http://localhost:3000/del/orders/end-task/${orderId}`,
+            `https://rr-5d46.onrender.com/del/orders/end-task/${orderId}`,
             {},
             {
               headers: {

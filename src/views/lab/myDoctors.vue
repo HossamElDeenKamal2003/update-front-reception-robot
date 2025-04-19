@@ -85,7 +85,7 @@ export default {
       loading: false,
       error: null,
       removingDoctor: null,
-      baseUrl: 'http://localhost:3000/labdash'
+      baseUrl: 'https://rr-5d46.onrender.com/labdash'
     }
   },
   components: {

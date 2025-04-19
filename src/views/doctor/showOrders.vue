@@ -344,7 +344,7 @@ export default {
 
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get(`http://localhost:3000/docdash/order/${this.id}`, {
+        const response = await axios.get(`https://rr-5d46.onrender.com/docdash/order/${this.id}`, {
           headers: { Authorization: `Bearer ${token}` },
           cancelToken: this.cancelToken.token,
         });
@@ -467,7 +467,7 @@ export default {
       try {
         this.loading = true;
         const token = localStorage.getItem("token");
-        await axios.put(`http://localhost:3000/docdash/order/${this.id}`, formData, {
+        await axios.put(`https://rr-5d46.onrender.com/docdash/order/${this.id}`, formData, {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "multipart/form-data",

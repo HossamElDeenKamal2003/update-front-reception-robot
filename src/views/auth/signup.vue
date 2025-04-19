@@ -161,7 +161,7 @@ export default {
       emailError: '',
       passwordError: '',
       confirmPasswordError: '',
-      baseUrl: "http://localhost:3000",
+      baseUrl: "https://rr-5d46.onrender.com",
     }
   },
   methods: {

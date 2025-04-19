@@ -110,7 +110,7 @@ export default {
   components: { LabsNavbar },
   data() {
     return {
-      baseUrl: 'http://localhost:3000/labdash',
+      baseUrl: 'https://rr-5d46.onrender.com/labdash',
       contract: { teethTypes: {} },
       doctorId: null,
       newType: '',

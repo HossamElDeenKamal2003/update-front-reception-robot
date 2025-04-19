@@ -101,7 +101,7 @@ export default {
   },
   data() {
     return {
-      baseUrl: "http://localhost:3000/docdash",
+      baseUrl: "https://rr-5d46.onrender.com/docdash",
       orders: [],
       filteredOrders: [],
       loading: false,
