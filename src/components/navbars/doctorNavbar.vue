@@ -15,8 +15,12 @@
           <router-link to="/accounts">Accounts</router-link>
           <div v-if="username" class="user-info">
             <span>Welcome, {{ username }}</span>
+            <div v-if="uid" class="uid-display">
+              <span class="uid-label">ID:</span>
+              <span class="uid-value">{{ uid }}</span>
+            </div>
             <a href="#" class="logout" @click.prevent="logout">Logout</a>
-            <h2 v-if="uid">Your ID: {{ uid }}</h2>
+
           </div>
           <router-link v-else to="/login">Login</router-link>
         </div>
@@ -57,16 +61,20 @@ export default {
   data() {
     return {
       drawerOpen: false,
+      localUid: localStorage.getItem('uid'),
     };
   },
   computed: {
-    // Retrieve the username from localStorage.
     username() {
-      return localStorage.getItem("username");
+      return localStorage.getItem("username") || '';
     },
-    uid(){
-      return localStorage.getItem("uid");
-    }
+    uid() {
+      // Use both local storage and data property
+      return this.localUid || localStorage.getItem("uid") || '';
+    },
+  },
+  created() {
+    console.log(this.localUid)
   },
   methods: {
     logout() {
@@ -132,6 +140,22 @@ export default {
 
 .nav-links a:hover {
   color: #007bff;
+}
+
+.uid-display {
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 4px;
+  display: flex;
+  gap: 4px;
+}
+
+.uid-label {
+  font-weight: bold;
+}
+
+.uid-value {
+  font-family: monospace;
 }
 
 /* User Info */
