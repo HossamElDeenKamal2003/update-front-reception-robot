@@ -113,7 +113,7 @@ export default {
         switch(this.userType) {
           case 'doctor':
             username = response.data.result?.doctor?.username || '';
-            uid = response.data.result?.UID;
+            uid = response.data.result?.doctor.UID;
             localStorage.setItem("uid", uid);
             token = response.data.result?.token || '';
             break;
