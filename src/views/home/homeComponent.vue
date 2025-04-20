@@ -4,7 +4,9 @@
     <NavbarComponent />
 
     <!-- Sections -->
-    <section id="home">🏠 Welcome to Home</section>
+    <section id="home">
+      <img src="../../assets/homeImage.jpg" style="width: 100vw">
+    </section>
 
     <section id="services">
       <ServicesComponent />
