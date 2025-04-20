@@ -76,6 +76,7 @@ export default {
       phoneError: '',
       passwordError: '',
       userTypeError: '',
+      UID: '',
       baseUrl: "https://rr-5d46.onrender.com",
     }
   },
@@ -106,11 +107,14 @@ export default {
 
         let username = '';
         let token = '';
+        let uid = '';
 
         // Handle different response structures based on user type
         switch(this.userType) {
           case 'doctor':
             username = response.data.result?.doctor?.username || '';
+            uid = response.data.result?.UID;
+            localStorage.setItem("uid", uid);
             token = response.data.result?.token || '';
             break;
           case 'lab':

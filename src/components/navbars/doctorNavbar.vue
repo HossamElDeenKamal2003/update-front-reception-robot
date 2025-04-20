@@ -16,6 +16,7 @@
           <div v-if="username" class="user-info">
             <span>Welcome, {{ username }}</span>
             <a href="#" class="logout" @click.prevent="logout">Logout</a>
+            <h2 v-if="uid">Your ID: {{ uid }}</h2>
           </div>
           <router-link v-else to="/login">Login</router-link>
         </div>
@@ -63,13 +64,16 @@ export default {
     username() {
       return localStorage.getItem("username");
     },
+    uid(){
+      return localStorage.getItem("uid");
+    }
   },
   methods: {
     logout() {
       // Remove user data
       localStorage.removeItem("token");
       localStorage.removeItem("username");
-
+      localStorage.removeItem("uid");;
       // Close the drawer if it is open
       this.drawerOpen = false;
 
