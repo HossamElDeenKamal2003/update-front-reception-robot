@@ -200,6 +200,10 @@
             <img src="../../assets/img/15.jpeg" alt="Tooth 15" class="tooth-img" :class="{ selected: selectedTeeth.includes(15) }" @click="toggleTooth(15)">
             <div class="tooth-number">15</div>
           </div>
+          <div class="tooth-wrapper">
+            <img src="../../assets/img/1.jpeg" alt="Tooth 1" class="tooth-img" :class="{ selected: selectedTeeth.includes(1) }" @click="toggleTooth(1)">
+            <div class="tooth-number">16</div>
+          </div>
         </div>
 
         <!-- Color -->
