@@ -11,8 +11,10 @@
 
         <!-- Nav Links for larger screens -->
         <div class="nav-links desktop-only">
+          <router-link to="/create-order">Create Order</router-link>
+
           <router-link to="/doctor/orders">Orders</router-link>
-          <router-link to="/accounts">Accounts</router-link>
+<!--          <router-link to="/accounts">Accounts</router-link>-->
           <div v-if="username" class="user-info">
             <span>Welcome, {{ username }}</span>
             <div v-if="uid" class="uid-display">
@@ -20,7 +22,6 @@
               <span class="uid-value">{{ uid }}</span>
             </div>
             <a href="#" class="logout" @click.prevent="logout">Logout</a>
-
           </div>
           <router-link v-else to="/login">Login</router-link>
         </div>
@@ -41,11 +42,14 @@
           <button class="close-btn" @click="toggleDrawer">&times;</button>
         </div>
         <div class="drawer-links">
-          <!-- Removed .native modifier -->
           <router-link to="/allorders" @click="toggleDrawer">Orders</router-link>
           <router-link to="/accounts" @click="toggleDrawer">Accounts</router-link>
           <div v-if="username" class="user-info">
             <span>Welcome, {{ username }}</span>
+            <div v-if="uid" class="uid-display">
+              <span class="uid-label">ID:</span>
+              <span class="uid-value">{{ uid }}</span>
+            </div>
             <a href="#" class="logout" @click.prevent="logout">Logout</a>
           </div>
           <router-link v-else to="/login" @click="toggleDrawer">Login</router-link>
@@ -69,23 +73,15 @@ export default {
       return localStorage.getItem("username") || '';
     },
     uid() {
-      // Use both local storage and data property
       return this.localUid || localStorage.getItem("uid") || '';
     },
   },
-  created() {
-    console.log(this.localUid)
-  },
   methods: {
     logout() {
-      // Remove user data
       localStorage.removeItem("token");
       localStorage.removeItem("username");
       localStorage.removeItem("uid");
-      // Close the drawer if it is open
       this.drawerOpen = false;
-
-      // Redirect to the login page using Vue Router
       this.$router.push({ name: "login" });
     },
     toggleDrawer() {
@@ -142,20 +138,29 @@ export default {
   color: #007bff;
 }
 
+/* Enhanced UID Display */
 .uid-display {
-  font-size: 0.8rem;
-  color: #666;
-  margin-top: 4px;
   display: flex;
-  gap: 4px;
+  align-items: center;
+  gap: 6px;
+  margin-left: 10px;
 }
 
 .uid-label {
   font-weight: bold;
+  color: #333;
 }
 
 .uid-value {
-  font-family: monospace;
+  font-weight: 800; /* Extra bold */
+  font-size: 0.9rem;
+  font-family: 'Courier New', monospace;
+  background-color: #4CAF50; /* Green background */
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 2px solid #388E3C; /* Darker green border */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 /* User Info */
@@ -169,13 +174,14 @@ export default {
   color: red;
   cursor: pointer;
   font-weight: bold;
+  margin-left: 10px;
 }
 
 .logout:hover {
   text-decoration: underline;
 }
 
-/* Hamburger Menu (only on mobile) */
+/* Hamburger Menu and Drawer styles remain the same */
 .hamburger {
   cursor: pointer;
   display: flex;
@@ -204,7 +210,6 @@ export default {
   transform: translateY(-8px) rotate(-45deg);
 }
 
-/* Drawer Styles */
 .drawer {
   position: fixed;
   top: 0;
@@ -246,7 +251,6 @@ export default {
   font-size: 1.2rem;
 }
 
-/* Transition for drawer */
 .slide-enter-active, .slide-leave-active {
   transition: transform 0.3s ease;
 }
@@ -263,13 +267,19 @@ export default {
   display: none;
 }
 
-/* Show mobile-only elements on small screens */
 @media (max-width: 768px) {
   .desktop-only {
     display: none;
   }
   .mobile-only {
     display: flex;
+  }
+
+  /* Mobile-specific UID styling */
+  .uid-display {
+    flex-direction: column;
+    align-items: flex-start;
+    margin: 5px 0;
   }
 }
 </style>

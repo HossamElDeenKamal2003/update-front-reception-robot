@@ -280,8 +280,8 @@
       </fieldset>
 
       <!-- Print Icon -->
-      <div class="print-icon" @click="printForm" title="Print as PDF">
-        <font-awesome-icon icon="print" />
+      <div class="print-icon" @click="printForm" title="Print as PDF" style="margin-top: 25px">
+<!--        <font-awesome-icon icon="print" />-->
         <font-awesome-icon icon="file-pdf" />
       </div>
     </form>
@@ -323,6 +323,7 @@ export default {
         file: null,
         prova: true,
       },
+      // https://rr-5d46.onrender.com
       baseUrl: "https://rr-5d46.onrender.com",
       errors: {},
       upperTeeth: [17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32],
@@ -531,6 +532,7 @@ export default {
               },
             }
         );
+        console.log(formData)
         console.log(response.data);
 
         // Generate Order ID
@@ -629,7 +631,56 @@ body {
   padding-top: 80px;
 }
 
+.print-icon {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  font-size: 1.375rem;
+  background: #4caf50;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
 
+.print-icon:hover {
+  background: #3e8e41;
+}
+
+.print-icon svg {
+  width: 1em;
+  height: 1em;
+}
+
+.chat-icon {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  font-size: 1.625rem;
+  background: #007bff;
+  color: white;
+  padding: 12px;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chat-icon:hover {
+  background: #0069d9;
+}
+
+.chat-icon svg {
+  width: 1em;
+  height: 1em;
+}
 /* Form Container */
 .form-container {
   position: relative;

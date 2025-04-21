@@ -45,11 +45,11 @@
             <span class="radio-custom"></span>
             Delivery
           </label>
-          <label class="radio-option">
-            <input type="radio" name="userType" value="user" v-model="userType">
-            <span class="radio-custom"></span>
-            User
-          </label>
+<!--          <label class="radio-option">-->
+<!--            <input type="radio" name="userType" value="user" v-model="userType">-->
+<!--            <span class="radio-custom"></span>-->
+<!--            User-->
+<!--          </label>-->
         </div>
         <div v-if="userTypeError" class="error-message">{{ userTypeError }}</div>
       </div>
@@ -116,10 +116,12 @@ export default {
             uid = response.data.result?.doctor.UID;
             localStorage.setItem("uid", uid);
             token = response.data.result?.token || '';
+            this.$router.push('/create-order');
             break;
           case 'lab':
             username = response.data.lab?.username || '';
             token = response.data.token || '';
+            this.$router.push('/lab')
             break;
           case 'delivery':
             username = response.data.result?.delivery?.username || '';
@@ -136,7 +138,7 @@ export default {
 
         localStorage.setItem('username', username);
         localStorage.setItem('token', token);
-        this.$router.push('/');
+        // this.$router.push('/');
 
       }).catch(error => {
         console.error('Login error:', error);

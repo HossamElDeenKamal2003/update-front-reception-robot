@@ -3,9 +3,13 @@
     <!-- Navbar Component -->
     <NavbarComponent />
 
-    <!-- Sections -->
-    <section id="home">
-      <img src="../../assets/homeImage.jpg" style="width: 100vw">
+    <!-- Hero Section -->
+    <section id="home" class="hero-section">
+      <img
+          src="../../assets/homeImage.jpg"
+          alt="Home Banner"
+          class="hero-image"
+      >
     </section>
 
     <section id="services">
@@ -41,19 +45,52 @@ export default {
   scroll-behavior: smooth;
 }
 
-body {
-  background: url('https://source.unsplash.com/1600x900/?technology,robot') no-repeat center center/cover;
-  height: 100vh;
-  color: white;
-  margin: 0;
-  padding: 0;
+.hero-section {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.hero-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+}
+
+/* For taller screens where you want the image to fill height */
+@media (min-aspect-ratio: 16/9) {
+  .hero-image {
+    height: 100vh;
+    width: auto;
+    min-width: 100%;
+    object-position: center;
+  }
 }
 
 section {
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 40px;
+  font-size: clamp(1.5rem, 4vw, 2.5rem); /* Responsive font size */
+}
+
+#services {
+  padding: 2rem;
+  background-color: #f8f9fa; /* Example background */
+}
+
+/* Optional: Add smooth transition for image loading */
+.hero-image {
+  transition: opacity 0.3s ease;
+}
+
+.hero-image.loading {
+  opacity: 0;
+}
+
+.hero-image.loaded {
+  opacity: 1;
 }
 </style>

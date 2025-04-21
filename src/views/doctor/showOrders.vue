@@ -271,7 +271,7 @@
 </template>
 
 <script>
-import labNavbar from "@/components/navbars/labsNavbar.vue";
+import labNavbar from "@/components/navbars/doctorNavbar.vue";
 import axios from "axios";
 import { format } from "date-fns";
 

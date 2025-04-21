@@ -5,9 +5,14 @@
       <h2>Orders</h2>
       <audio
           ref="notificationSound"
-          :src="require('../../assets/ring.mp3')"
+          :src="require('../../assets/سناب-شات.mp3')"
           preload="auto"
+          :loop="isSoundLooping"
       ></audio>
+      <div class="new-order-alert" v-if="showStopButton">
+        <p>New order received!</p>
+        <button @click="stopNotificationSound" class="stop-btn">Stop Alert</button>
+      </div>
       <div class="controls">
         <div class="search-box">
           <input
@@ -24,14 +29,12 @@
             <option value="doctor">Doctor</option>
           </select>
         </div>
-
         <div class="date-filter">
           <input type="date" v-model="startDate" @change="applyFilters" />
           <span>to</span>
           <input type="date" v-model="endDate" @change="applyFilters" />
           <button @click="clearDateFilter">Clear Dates</button>
         </div>
-
         <div class="status-filters">
           <button
               v-for="filter in filters"
@@ -43,10 +46,8 @@
           </button>
         </div>
       </div>
-
       <div v-if="loading" class="loading">Loading orders...</div>
       <div v-else-if="error" class="error">{{ error }}</div>
-
       <div v-else class="order-cards">
         <div
             v-for="order in paginatedOrders"
@@ -59,7 +60,6 @@
           <p><strong>Status:</strong> {{ order.status }}</p>
           <p><strong>Doctor:</strong> {{ order.doctorId.username }}</p>
           <p><strong>Price:</strong> {{ formatCurrency(order.price) }}</p>
-
           <div class="price-inputs">
             <div class="input-group">
               <label>Paid:</label>
@@ -82,15 +82,12 @@
                 <span v-else>✓</span>
               </button>
             </div>
-
             <div class="rest-display">
               <label>Rest:</label>
               <span class="rest-value">{{ formatCurrency(calculateRest(order)) }}</span>
             </div>
           </div>
-
           <p><strong>Last Updated:</strong> {{ formatDate(order.updatedAt) }}</p>
-
           <div class="card-actions">
             <router-link
                 :to="{ name: 'showOrderlab', params: { id: order._id } }"
@@ -98,11 +95,10 @@
             >
               View Order Details
             </router-link>
-
             <button
                 @click="markOrderAsReady(order._id)"
                 class="mark-ready-btn"
-
+                :disabled="!canMarkAsReady(order.status)"
             >
               <span v-if="processingOrder === order._id" class="btn-spinner"></span>
               {{ processingOrder === order._id ? 'Processing...' : 'Mark as Lab Ready' }}
@@ -110,7 +106,6 @@
           </div>
         </div>
       </div>
-
       <div v-if="totalPages > 1" class="pagination">
         <button @click="prevPage" :disabled="currentPage === 1">
           Previous
@@ -121,7 +116,6 @@
         </button>
       </div>
     </div>
-
     <div class="chat-icon">
       <a href="#chat">🗨️</a>
     </div>
@@ -135,6 +129,7 @@ import { format } from "date-fns";
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 import io from 'socket.io-client';
+
 export default {
   name: "LabOrders",
   components: {
@@ -145,7 +140,7 @@ export default {
       baseUrl: "https://rr-5d46.onrender.com/labdash",
       orders: [],
       socket: null,
-      labId: null, //
+      labId: null,
       filteredOrders: [],
       loading: false,
       error: null,
@@ -159,6 +154,8 @@ export default {
       cancelToken: null,
       isMounted: false,
       processingOrder: null,
+      isSoundLooping: false,
+      showStopButton: false,
       filters: [
         { label: "All", value: "all" },
         { label: "Underway", value: "lab received" },
@@ -200,47 +197,43 @@ export default {
     if (this.cancelToken) {
       this.cancelToken.cancel("Component unmounted");
     }
+    if (this.socket) {
+      this.socket.disconnect();
+    }
   },
   methods: {
     initSocket() {
       if (!this.labId) return;
 
-      // Disconnect existing socket if any
       if (this.socket) {
         this.socket.disconnect();
       }
 
-      // Connect to Socket.IO server with query parameter
       this.socket = io('https://rr-5d46.onrender.com/', {
         query: {
           labId: this.labId
         }
       });
 
-      // Listen for lab-specific orders
       this.socket.on(`get-orders/${this.labId}`, (data) => {
         this.handleNewOrder(data.orders);
       });
 
-      // General error handling
       this.socket.on('connect_error', (error) => {
         console.error('Socket connection error:', error);
         toast.error('Connection to live updates failed. Please refresh the page.');
       });
 
-      // Reconnect logic
       this.socket.on('reconnect', (attempt) => {
         console.log(`Reconnected after ${attempt} attempts`);
         toast.info('Reconnected to live updates');
       });
     },
-
-
     handleNewOrder(newOrder) {
-      // Play notification sound
+      this.isSoundLooping = true;
+      this.showStopButton = true;
       this.playNotificationSound();
 
-      // Show toast notification
       toast.info(`New order received: #${newOrder.UID}`, {
         position: 'top-right',
         autoClose: 5000,
@@ -250,38 +243,47 @@ export default {
         draggable: true,
         progress: undefined,
       });
-
-      // Add the new order to the beginning of the orders array
+      console.log("New order received from socket:", newOrder);
+      console.dir(newOrder, { depth: null });
       this.orders.unshift({
         ...newOrder,
         paid: newOrder.paid || newOrder.paied || 0,
         price: newOrder.price || 0
       });
 
-      // Update filtered orders
       this.filteredOrders = [...this.orders];
 
-      // If on first page, refresh the view
       if (this.currentPage === 1) {
         this.applyFilters();
       }
     },
-
     playNotificationSound() {
       try {
         const sound = this.$refs.notificationSound;
         if (sound) {
-          sound.currentTime = 0; // Rewind to start
-          sound.play().catch(e => console.log('Audio play failed:', e));
+          sound.currentTime = 0;
+          sound.play().catch(e => console.error('Audio play failed:', e));
         }
       } catch (e) {
         console.error('Error playing notification sound:', e);
       }
     },
-
+    stopNotificationSound() {
+      try {
+        const sound = this.$refs.notificationSound;
+        if (sound) {
+          sound.pause();
+          sound.currentTime = 0;
+          this.isSoundLooping = false;
+          this.showStopButton = false;
+        }
+      } catch (e) {
+        console.error('Error stopping notification sound:', e);
+      }
+    },
     debounce(fn, delay) {
       let timeoutId;
-      return function(...args) {
+      return function (...args) {
         clearTimeout(timeoutId);
         timeoutId = setTimeout(() => fn.apply(this, args), delay);
       };
@@ -319,7 +321,6 @@ export default {
     nextPage() {
       if (this.currentPage < this.totalPages) this.currentPage++;
     },
-
     async fetchOrders() {
       if (!this.isMounted) return;
 
@@ -341,11 +342,9 @@ export default {
           }));
           this.filteredOrders = [...this.orders];
 
-          // Get labId from the first order (assuming all orders belong to the same lab)
           if (this.orders.length > 0 && this.orders[0].labId) {
             this.labId = this.orders[0].labId;
-            // localStorage.setItem('labId', this.labId);
-            this.initSocket(); // Initialize socket after getting labId
+            this.initSocket();
           }
         }
       } catch (error) {
@@ -356,7 +355,6 @@ export default {
         }
       }
     },
-
     async updatePrice(order) {
       if (!this.isValidPayment(order) || this.processingOrder) return;
 
@@ -398,7 +396,6 @@ export default {
         this.processingOrder = null;
       }
     },
-
     async markOrderAsReady(orderId) {
       this.processingOrder = orderId;
       try {
@@ -424,7 +421,6 @@ export default {
         this.processingOrder = null;
       }
     },
-
     applyFilters() {
       let filtered = [...this.orders];
 
@@ -452,7 +448,7 @@ export default {
                 order.patientName?.toLowerCase().includes(term) ||
                 order.status?.toLowerCase().includes(term) ||
                 order.doctorId?.username?.toLowerCase().includes(term)
-            ); // Added semicolon
+            );
           }
           const fieldValue = order[this.searchField]?.toLowerCase();
           return fieldValue?.includes(term);
@@ -462,22 +458,18 @@ export default {
       this.filteredOrders = filtered;
       this.currentPage = 1;
     },
-
     clearDateFilter() {
       this.startDate = "";
       this.endDate = "";
       this.applyFilters();
     },
-
     applyStatusFilter(filter) {
       this.activeFilter = filter;
       this.applyFilters();
     },
-
     handleSearch() {
       this.applyFilters();
     },
-
     handleError(error) {
       let message = "An error occurred";
       if (error.response) {
@@ -514,12 +506,36 @@ export default {
   max-width: 1200px;
   margin: 0 auto;
 }
-
 h2 {
   color: #333;
   margin-bottom: 20px;
 }
-
+.new-order-alert {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  background-color: #fff3cd;
+  border: 1px solid #ffeeba;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+.new-order-alert p {
+  margin: 0;
+  color: #856404;
+}
+.stop-btn {
+  padding: 8px 12px;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.stop-btn:hover {
+  background-color: #c82333;
+}
 .controls {
   margin-bottom: 20px;
   display: flex;
@@ -527,38 +543,32 @@ h2 {
   gap: 15px;
   align-items: center;
 }
-
 .search-box {
   display: flex;
   gap: 10px;
   align-items: center;
 }
-
 .search-box input {
   padding: 8px 12px;
   border: 1px solid #ddd;
   border-radius: 4px;
   min-width: 250px;
 }
-
 .search-box select {
   padding: 8px;
   border: 1px solid #ddd;
   border-radius: 4px;
 }
-
 .date-filter {
   display: flex;
   align-items: center;
   gap: 10px;
 }
-
 .date-filter input {
   padding: 8px;
   border: 1px solid #ddd;
   border-radius: 4px;
 }
-
 .date-filter button {
   padding: 8px 12px;
   background-color: #f8f9fa;
@@ -566,12 +576,10 @@ h2 {
   border-radius: 4px;
   cursor: pointer;
 }
-
 .status-filters {
   display: flex;
   gap: 10px;
 }
-
 .status-filters button {
   padding: 8px 16px;
   border: 1px solid #ddd;
@@ -580,19 +588,16 @@ h2 {
   cursor: pointer;
   transition: all 0.2s;
 }
-
 .status-filters button.active {
   background: #00c3ff;
   color: white;
   border-color: #00c3ff;
 }
-
 .order-cards {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 20px;
 }
-
 .card {
   background: white;
   border-radius: 8px;
@@ -602,37 +607,30 @@ h2 {
   display: flex;
   flex-direction: column;
 }
-
 .card:hover {
   transform: translateY(-5px);
 }
-
 .card h3 {
   margin-top: 0;
   color: #00c3ff;
 }
-
 .card p {
   margin: 8px 0;
 }
-
 .price-inputs {
   display: flex;
   flex-direction: column;
   gap: 15px;
   margin: 15px 0;
 }
-
 .input-group {
   display: flex;
   align-items: center;
   gap: 8px;
 }
-
 .input-group label {
   min-width: 50px;
 }
-
 .input-group input {
   flex: 1;
   padding: 8px;
@@ -640,7 +638,6 @@ h2 {
   border-radius: 4px;
   max-width: 120px;
 }
-
 .update-btn {
   width: 30px;
   height: 30px;
@@ -654,27 +651,22 @@ h2 {
   cursor: pointer;
   transition: background-color 0.2s;
 }
-
 .update-btn:hover:not(:disabled) {
   background-color: #218838;
 }
-
 .update-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   background-color: #cccccc;
 }
-
 .rest-display {
   display: flex;
   align-items: center;
   gap: 8px;
 }
-
 .rest-display label {
   min-width: 50px;
 }
-
 .rest-value {
   padding: 8px;
   background-color: #f8f9fa;
@@ -682,14 +674,12 @@ h2 {
   min-width: 100px;
   display: inline-block;
 }
-
 .card-actions {
   margin-top: auto;
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
-
 .view-order-btn {
   padding: 8px 16px;
   background-color: #00c3ff;
@@ -699,11 +689,9 @@ h2 {
   text-align: center;
   transition: background-color 0.3s;
 }
-
 .view-order-btn:hover {
   background-color: #0099cc;
 }
-
 .mark-ready-btn {
   padding: 8px 16px;
   background-color: #17a2b8;
@@ -713,16 +701,13 @@ h2 {
   cursor: pointer;
   transition: background-color 0.3s;
 }
-
 .mark-ready-btn:hover:not(:disabled) {
   background-color: #138496;
 }
-
 .mark-ready-btn:disabled {
   opacity: 0.7;
   cursor: not-allowed;
 }
-
 .btn-spinner {
   display: inline-block;
   width: 12px;
@@ -733,27 +718,21 @@ h2 {
   animation: spin 1s ease-in-out infinite;
   margin-right: 8px;
 }
-
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
-
 .status-docready {
   border-left: 4px solid #ffc107;
 }
-
 .status-labready {
   border-left: 4px solid #17a2b8;
 }
-
 .status-end {
   border-left: 4px solid #28a745;
 }
-
 .status-underway {
   border-left: 4px solid #6c757d;
 }
-
 .pagination {
   display: flex;
   justify-content: center;
@@ -761,7 +740,6 @@ h2 {
   gap: 20px;
   margin-top: 30px;
 }
-
 .pagination button {
   padding: 8px 16px;
   border: 1px solid #ddd;
@@ -770,22 +748,18 @@ h2 {
   cursor: pointer;
   transition: all 0.2s;
 }
-
 .pagination button:hover:not(:disabled) {
   background-color: #f0f0f0;
 }
-
 .pagination button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
-
 .loading {
   padding: 20px;
   text-align: center;
   color: #666;
 }
-
 .error {
   padding: 20px;
   text-align: center;
@@ -794,7 +768,6 @@ h2 {
   border-radius: 4px;
   margin: 20px 0;
 }
-
 .chat-icon {
   position: fixed;
   bottom: 20px;
@@ -810,11 +783,9 @@ h2 {
   cursor: pointer;
   transition: transform 0.2s;
 }
-
 .chat-icon:hover {
   transform: scale(1.1);
 }
-
 .chat-icon a {
   color: white;
   text-decoration: none;

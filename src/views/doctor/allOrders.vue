@@ -54,7 +54,7 @@
           <p><strong>Patient Name:</strong> {{ order.patientName }}</p>
           <p><strong>Status:</strong> {{ order.status }}</p>
           <p><strong>Price:</strong> {{ order.price }}</p>
-          <p><strong>Paid:</strong> {{ order.paied }}</p>
+          <p><strong>Paid:</strong> {{ order.paid }}</p>
           <p><strong>rest:</strong> {{ order.rest }}</p>
           <p><strong>Last Updated:</strong> {{ formatDate(order.updatedAt) }}</p>
           <router-link
@@ -178,7 +178,7 @@ export default {
         });
         console.log(data);
         if (this.isMounted) {
-          this.orders = data.orders || data;
+          this.orders = data.orders.reverse() || data;
           this.filteredOrders = [...this.orders];
         }
       } catch (error) {

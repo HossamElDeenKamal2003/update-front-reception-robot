@@ -150,7 +150,7 @@ export default {
         });
 
         if (response.data.status === 200) {
-          this.orders = response.data.data;
+          this.orders = response.data.data.reverse();
           if (this.activeTab === 'my') {
             this.myOrdersCount = response.data.orders;
           }
