@@ -215,14 +215,25 @@
             <div class="tooth-number">15</div>
           </div>
           <div class="tooth-wrapper">
-            <img src="../../assets/img/1.jpeg" alt="Tooth 1" class="tooth-img" :class="{ selected: selectedTeeth.includes(1) }" @click="toggleTooth(1)">
+            <img src="../../assets/img/1.jpeg" alt="Tooth 1" class="tooth-img" :class="{ selected: selectedTeeth.includes(1) }" @click="toggleTooth(16)">
             <div class="tooth-number">16</div>
           </div>
         </div>
 
         <!-- Color -->
-        <label for="color">Color:</label>
-        <input type="text" id="color" v-model="orderData.color" required />
+        <label for="color">Tooth Color:</label>
+        <select id="color" class="form-select" v-model="orderData.color" required>
+          <option value="" disabled>Select a color</option>
+          <option
+              v-for="color in availableColors"
+              :key="color.value"
+              :value="color.value"
+              :style="{ backgroundColor: color.bgColor }"
+          >
+            {{ color.label }}
+          </option>
+        </select>
+        <span class="error" v-if="errors.color">{{ errors.color }}</span>
         <span class="error" v-if="errors.color">{{ errors.color }}</span>
 
         <!-- Notes -->
@@ -304,6 +315,28 @@ export default {
     return {
       isActiveSidebar: false,
       labs: [],
+      availableColors: [
+        { value: 'A1', label: 'A1', bgColor: '#f0e5d1' },
+        { value: 'A2', label: 'A2', bgColor: '#e6d9c3' },
+        { value: 'A3', label: 'A3', bgColor: '#e0d0b8' },
+        { value: 'A3.5', label: 'A3.5', bgColor: '#d9c8ad' },
+        { value: 'A4', label: 'A4', bgColor: '#d3c0a2' },
+        { value: 'B1', label: 'B1', bgColor: '#e8e1d1' },
+        { value: 'B2', label: 'B2', bgColor: '#d9cfb8' },
+        { value: 'B3', label: 'B3', bgColor: '#c9bba0' },
+        { value: 'B4', label: 'B4', bgColor: '#baa887' },
+        { value: 'C1', label: 'C1', bgColor: '#e0d5c0' },
+        { value: 'C2', label: 'C2', bgColor: '#d5c6ab' },
+        { value: 'C3', label: 'C3', bgColor: '#c9b796' },
+        { value: 'C4', label: 'C4', bgColor: '#bda881' },
+        { value: 'D2', label: 'D2', bgColor: '#e3d8c6' },
+        { value: 'D3', label: 'D3', bgColor: '#d7c9b2' },
+        { value: 'D4', label: 'D4', bgColor: '#cbba9e' },
+        { value: 'BL1', label: 'BL1', bgColor: '#e0d9cc' },
+        { value: 'BL2', label: 'BL2', bgColor: '#d1c7b5' },
+        { value: 'BL3', label: 'BL3', bgColor: '#c2b59e' },
+        { value: 'BL4', label: 'BL4', bgColor: '#b3a387' }
+      ],
       selectedTeeth: [],
       orderId: null,
       availableTeethTypes: {},
@@ -756,6 +789,18 @@ button:hover {
   font-size: 1rem;
   font-weight: bold;
   text-align: center;
+}
+
+.form-select option {
+  padding: 8px;
+  margin: 2px 0;
+}
+
+/* For browsers that support styling options */
+.form-select option[style*="background-color"] {
+  color: #333;
+  font-weight: bold;
+  text-shadow: 0 0 2px rgba(255,255,255,0.7);
 }
 
 .print-icon {
