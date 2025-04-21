@@ -97,9 +97,7 @@
             </router-link>
             <button
                 @click="markOrderAsReady(order._id)"
-                class="mark-ready-btn"
-                :disabled="!canMarkAsReady(order.status)"
-            >
+                class="mark-ready-btn">
               <span v-if="processingOrder === order._id" class="btn-spinner"></span>
               {{ processingOrder === order._id ? 'Processing...' : 'Mark as Lab Ready' }}
             </button>
