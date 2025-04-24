@@ -1,3 +1,4 @@
+```vue
 <template>
   <DoctorNavbar />
   <div class="form-container" ref="formContainer">
@@ -12,6 +13,11 @@
         <select v-model="orderData.prova" id="status">
           <option :value="true">Provisional</option>
           <option :value="false">Final</option>
+        </select>
+        <label for="scanFile">Scan File:</label>
+        <select v-model="orderData.scanFile" id="scanFile">
+          <option :value="false">No</option>
+          <option :value="true">Yes</option>
         </select>
         <span class="error" v-if="errors.prova">{{ errors.prova }}</span>
 
@@ -56,12 +62,27 @@
 
         <!-- Lab Selection -->
         <label for="labId">Lab:</label>
-        <select v-model="orderData.labId" id="labId" @change="updateTeethTypes">
-          <option value="" disabled>Select a lab</option>
-          <option v-for="lab in labs" :key="lab._id" :value="lab._id">
-            {{ lab.username }}
-          </option>
-        </select>
+        <div class="lab-selection-container">
+          <select v-model="orderData.labId" id="labId" @change="updateTeethTypes">
+            <option value="" disabled>Select a lab</option>
+            <option v-for="lab in labs" :key="lab._id" :value="lab._id">
+              {{ lab.username }}
+            </option>
+          </select>
+
+          <!-- Show email icon only when scan file exists AND a lab is selected -->
+          <a
+              v-if="orderData.scanFile && orderData.labId"
+              :href="'mailto:' + getLabEmail(orderData.labId)"
+              class="email-icon"
+              title="Email this lab"
+          >
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M22 6L12 13L2 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+        </div>
         <span class="error" v-if="errors.labId">{{ errors.labId }}</span>
 
         <!-- Type of Teeth (Dynamic based on selected lab) -->
@@ -215,7 +236,7 @@
             <div class="tooth-number">15</div>
           </div>
           <div class="tooth-wrapper">
-            <img src="../../assets/img/1.jpeg" alt="Tooth 1" class="tooth-img" :class="{ selected: selectedTeeth.includes(16) }" @click="toggleTooth(16)">
+            <img src="../../assets/img/1.jpeg" alt="Tooth 1" class="tooth-img" :class="{ selected: selectedTeeth.includes(1) }" @click="toggleTooth(1)">
             <div class="tooth-number">16</div>
           </div>
         </div>
@@ -233,7 +254,6 @@
             {{ color.label }}
           </option>
         </select>
-        <span class="error" v-if="errors.color">{{ errors.color }}</span>
         <span class="error" v-if="errors.color">{{ errors.color }}</span>
 
         <!-- Notes -->
@@ -288,27 +308,67 @@
 
         <!-- Submit Button -->
         <button type="submit">Submit</button>
+
+        <!-- Print Icon Inside Form (Matching ShowOrder.vue) -->
+        <div class="print-icon" @click="printForm" title="Print as PDF">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6 9V2H18V9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M6 18H4C2.89543 18 2 17.1046 2 16V11C2 9.89543 2.89543 9 4 9H20C21.1046 9 22 9.89543 22 11V16C22 17.1046 21.1046 18 20 18H18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M18 14H6V22H18V14Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
       </fieldset>
 
-      <!-- Print Icon -->
-      <div class="print-icon" @click="printForm" title="Print as PDF" style="margin-top: 25px">
-<!--        <font-awesome-icon icon="print" />-->
-        <font-awesome-icon icon="file-pdf" />
+      <!-- Print and PDF Icons (Outside Form) -->
+      <div class="action-buttons" style="margin-top: 25px">
+        <!-- Print Icon -->
+        <div class="action-icon" @click="printOrder" title="Print Order">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6 9V2H18V9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M6 18H4C2.89543 18 2 17.1046 2 16V11C2 9.89543 2.89543 9 4 9H20C21.1046 9 22 9.89543 22 11V16C22 17.1046 21.1046 18 20 18H18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M18 14H6V22H18V14Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Printable Area -->
+      <div class="print-area" ref="printableArea" style="display: none;">
+        <div class="print-container">
+          <h2>Order Details</h2>
+          <p><strong>Order ID:</strong> <span>{{ orderId || '--' }}</span></p>
+          <p><strong>Patient Name:</strong> <span>{{ orderData.patientName || '--' }}</span></p>
+          <p><strong>Gender:</strong> <span>{{ orderData.sex || '--' }}</span></p>
+          <p><strong>Age:</strong> <span>{{ orderData.age || '--' }}</span></p>
+          <p><strong>Status:</strong> <span>{{ orderData.prova ? 'Provisional' : 'Final' }}</span></p>
+          <p><strong>Scan File:</strong> <span>{{ orderData.scanFile ? 'Yes' : 'No' }}</span></p>
+          <p><strong>Number of Teeth:</strong> <span>{{ orderData.teethNo || '--' }}</span></p>
+          <p><strong>Selected Teeth:</strong> <span>{{ selectedTeeth.length > 0 ? selectedTeeth.join(', ') : '--' }}</span></p>
+          <p><strong>Lab:</strong> <span>{{ labs.find(lab => lab._id === orderData.labId)?.username || '--' }}</span></p>
+          <p><strong>Tooth Type:</strong> <span>{{ orderData.type || '--' }}</span></p>
+          <p><strong>Tooth Color:</strong> <span>{{ orderData.color || '--' }}</span></p>
+          <p><strong>Notes:</strong> <span>{{ orderData.description || '--' }}</span></p>
+          <p><strong>Price:</strong> <span>{{ formatCurrency(calculatedPrice) }}</span></p>
+          <p><strong>Deadline:</strong> <span>{{ orderData.deadline || '--' }}</span></p>
+          <p><strong>Media Files:</strong> <span>{{ orderData.media.length > 0 ? orderData.media.map(file => file.name).join(', ') : '--' }}</span></p>
+        </div>
       </div>
     </form>
   </div>
 
   <!-- Chat Icon -->
   <div class="chat-icon" title="Chat with us">
-    <font-awesome-icon icon="comments" />
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M21 11.5C21 16.1944 16.9706 20 12 20C11.1185 20 10.2687 19.892 9.461 19.6912C8.84744 20.5295 7.94437 21.5 6 21.5C5.71765 21.5 5.46976 21.306 5.35165 21.0185C5.23353 20.731 5.27059 20.3985 5.44653 20.1465C5.62247 19.8945 5.5 19.5 5.5 19.5C5.5 16.356 7.85653 14 11 14C11.8865 14 12.7353 14.108 13.542 14.3088C15.142 13.5025 16.5 12.1015 16.5 11.5C16.5 9.567 14.4853 8 12 8C9.51471 8 7.5 9.567 7.5 11.5C7.5 12.1015 8.85882 13.5025 10.4588 14.3088C11.2655 14.108 12.1143 14 13 14C16.1435 14 18.5 16.356 18.5 19.5C18.5 19.5 18.3775 19.8945 18.5535 20.1465C18.7294 20.3985 18.7665 20.731 18.6484 21.0185C18.5303 21.306 18.2824 21.5 18 21.5C16.0556 21.5 15.1526 20.5295 14.539 19.6912C13.7313 19.892 12.8815 20 12 20C7.02944 20 3 16.1944 3 11.5C3 6.80558 7.02944 3 12 3C16.9706 3 21 6.80558 21 11.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
   </div>
 </template>
 
 <script>
 import axios from "axios";
-import html2pdf from "html2pdf.js";
 import DoctorNavbar from "@/components/navbars/doctorNavbar.vue";
-
+// import { format } from "date-fns";
+import { toast } from 'vue3-toastify';
+import 'vue3-toastify/dist/index.css';
 export default {
   name: "NewOrder",
   data() {
@@ -355,12 +415,13 @@ export default {
         video: null,
         file: null,
         prova: true,
+        scanFile: false,
+        media: [],
       },
-      // https://rr-5d46.onrender.com
       baseUrl: "https://rr-5d46.onrender.com",
       errors: {},
       upperTeeth: [17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32],
-      lowerTeeth: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+      lowerTeeth: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
     };
   },
   components: {
@@ -369,11 +430,8 @@ export default {
   computed: {
     calculatedPrice() {
       if (this.orderData.type && this.availableTeethTypes[this.orderData.type]) {
-        // Get the base price for the selected teeth type
         const basePrice = this.availableTeethTypes[this.orderData.type];
-        // Get the number of teeth (convert to number, default to 0)
         const teethCount = parseInt(this.orderData.teethNo) || 0;
-        // Calculate total price: base price × number of teeth
         return basePrice * teethCount;
       }
       return 0;
@@ -390,7 +448,6 @@ export default {
           headers: { Authorization: `Bearer ${token}` },
         });
         this.labs = response.data.labs.myLabs;
-        // Store the doctorId from the response if available
         if (response.data.labs.contract) {
           this.doctorId = response.data.labs.contract.doctorId;
         }
@@ -400,17 +457,18 @@ export default {
       }
     },
 
+    getLabEmail(labId) {
+      const selectedLab = this.labs.find(lab => lab._id === labId);
+      return selectedLab ? selectedLab.email : '';
+    },
 
     updateTeethTypes() {
-      // Reset teeth selection when changing labs
       this.selectedTeeth = [];
       this.orderData.teethNo = "0";
 
-      // Find the lab selected by the user
       const selectedLab = this.labs.find(lab => lab._id === this.orderData.labId);
 
       if (selectedLab) {
-        // Get doctorId from localStorage or component data
         const doctorId = this.doctorId || JSON.parse(localStorage.getItem("doctor"))?.id;
 
         if (!doctorId) {
@@ -418,14 +476,12 @@ export default {
           return;
         }
 
-        // Find the contract for the current doctor in the selected lab
         const contract = selectedLab.contracts.find(
             c => c.doctorId?.toString() === doctorId.toString()
         );
 
         if (contract && contract.teethTypes) {
           this.availableTeethTypes = contract.teethTypes;
-          // Auto-select the first teeth type if available
           const firstType = Object.keys(contract.teethTypes)[0];
           if (firstType) {
             this.orderData.type = firstType;
@@ -442,7 +498,7 @@ export default {
       }
     },
 
-    formatCurrency(value) {
+    formatCurrency (value) {
       return new Intl.NumberFormat('en-JO', {
         style: 'currency',
         currency: 'JOD'
@@ -457,10 +513,37 @@ export default {
     },
 
     handleFileUpload(event, field) {
-      if (field === "images") {
-        this.orderData.images = Array.from(event.target.files).slice(0, 3);
-      } else {
-        this.orderData[field] = event.target.files[0];
+      const maxFileSize = 5 * 1024 * 1024; // 5MB
+      const allowedTypes = [
+        'image/jpeg',
+        'image/png',
+        'audio/mpeg',
+        'audio/wav',
+        'application/zip'
+      ];
+      const maxFiles = 10;
+
+      const files = Array.from(event.target.files);
+      if (files.length > maxFiles) {
+        this.showError(`You can upload a maximum of ${maxFiles} files.`);
+        return;
+      }
+
+      for (let file of files) {
+        if (!allowedTypes.includes(file.type)) {
+          this.showError('Only JPEG, PNG, MP3, WAV, and ZIP files are allowed.');
+          return;
+        }
+        if (file.size > maxFileSize) {
+          this.showError('Each file must be less than 5MB.');
+          return;
+        }
+      }
+
+      if (field === 'images' || field === 'video') {
+        this.orderData.media = [...this.orderData.media, ...files].slice(0, maxFiles);
+      } else if (field === 'zip') {
+        this.orderData.media = [...this.orderData.media, ...files].slice(0, maxFiles);
       }
     },
 
@@ -470,11 +553,7 @@ export default {
       } else {
         this.selectedTeeth.push(toothNumber);
       }
-      // Update teeth count
       this.orderData.teethNo = this.selectedTeeth.length.toString();
-
-      // Force price recalculation by triggering a reactive update
-      // This is handled automatically by Vue's reactivity system
     },
 
     validateForm() {
@@ -535,20 +614,17 @@ export default {
       try {
         const formData = new FormData();
 
-        // Add the selected teeth numbers to the description/notes
         if (this.selectedTeeth.length > 0) {
           const teethNote = `Teeth numbers: ${this.selectedTeeth.join(', ')}. `;
           this.orderData.description = teethNote + (this.orderData.description || '');
         }
 
-        // Set the price from the selected type
         this.orderData.price = this.calculatedPrice;
 
-        // Append all order data to FormData
         Object.keys(this.orderData).forEach(key => {
-          if (key === "images") {
-            this.orderData.images.forEach((image, index) => {
-              formData.append(`image${index}`, image);
+          if (key === 'media') {
+            this.orderData.media.forEach((file, index) => {
+              formData.append(`media${index}`, file);
             });
           } else if (this.orderData[key] !== null && this.orderData[key] !== undefined) {
             formData.append(key, this.orderData[key]);
@@ -565,10 +641,8 @@ export default {
               },
             }
         );
-        console.log(formData)
-        console.log(response.data);
+        alert(response.data.message);
 
-        // Generate Order ID
         const randomLetters =
             String.fromCharCode(65 + Math.floor(Math.random() * 26)) +
             String.fromCharCode(65 + Math.floor(Math.random() * 26));
@@ -630,28 +704,119 @@ export default {
         video: null,
         file: null,
         prova: true,
+        scanFile: false,
+        media: [],
       };
       this.errors = {};
     },
 
-    printForm() {
-      const element = this.$refs.formContainer;
-      const opt = {
-        margin: 0.5,
-        filename: "Dental_Order.pdf",
-        image: { type: "jpeg", quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
-      };
-      html2pdf().set(opt).from(element).save();
+    preparePrintContent() {
+      if (!this.$refs.printableArea) {
+        toast.error("Printable area not found. Please try again.");
+        return null;
+      }
+
+      const printStyles = `
+    @page {
+      size: A5;
+      margin: 5mm; /* Reduced from 10mm to save space */
+    }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      font-size: 8pt; /* Reduced from 10pt */
+      line-height: 1.2; /* Reduced from 1.4 */
+    }
+    .print-container {
+      padding: 5mm; /* Reduced from 10mm */
+      width: 100%;
+      box-sizing: border-box;
+      page-break-inside: avoid;
+      transform: scale(0.9); /* Slightly scale down to fit */
+      transform-origin: top left;
+    }
+    .print-container h2 {
+      font-size: 12pt; /* Reduced from 14pt */
+      margin-bottom: 5mm; /* Reduced from 10mm */
+      text-align: center;
+    }
+    .print-container p {
+      margin: 2mm 0; /* Reduced from 5mm */
+      padding: 2mm; /* Reduced from 5mm */
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid #eee;
+    }
+    .print-container p strong {
+      font-weight: bold;
+      flex: 1;
+    }
+    .print-container p span {
+      flex: 2;
+      text-align: left;
+    }
+    * {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+  `;
+
+      const printableElement = this.$refs.printableArea.cloneNode(true);
+      printableElement.style.display = 'block';
+
+      return { printStyles, printableElement };
     },
-  },
+    executePrint({ printStyles, printableElement }) {
+      const printWindow = window.open('', '_blank');
+      if (!printWindow) {
+        this.showError("Failed to open print window. Please allow popups for this site.");
+        return;
+      }
+
+      const htmlStart = '<html><head><title>Order Print</title><style>';
+      const htmlMiddle = '</style></head><body>';
+      const htmlEnd = '</body></html>';
+
+      printWindow.document.write(htmlStart + printStyles + htmlMiddle + printableElement.innerHTML + htmlEnd);
+      printWindow.document.close();
+
+      // Wait for the window to load before printing
+      printWindow.onload = () => {
+        printWindow.print();
+        printWindow.close();
+      };
+
+      // Fallback in case onload doesn't fire
+      setTimeout(() => {
+        if (printWindow.document.readyState === 'complete') {
+          printWindow.print();
+          printWindow.close();
+        }
+      }, 1000);
+    },
+
+    printOrder() {
+      if (!this.validateForm()) {
+        this.showError("Please fill out all required fields before printing.");
+        return;
+      }
+      const { printStyles, printableElement } = this.preparePrintContent();
+      this.executePrint({ printStyles, printableElement });
+    },
+
+    printForm() {
+      if (!this.validateForm()) {
+        this.showError("Please fill out all required fields before printing.");
+        return;
+      }
+      const { printStyles, printableElement } = this.preparePrintContent();
+      this.executePrint({ printStyles, printableElement });
+    }
+  }
 };
 </script>
 
-<style scoped>
-/* Your existing styles remain the same */
-</style>
 <style scoped>
 body {
   font-family: Arial, sans-serif;
@@ -662,31 +827,6 @@ body {
   overflow-x: hidden;
   margin: 0 auto;
   padding-top: 80px;
-}
-
-.print-icon {
-  position: absolute;
-  bottom: 20px;
-  left: 20px;
-  font-size: 1.375rem;
-  background: #4caf50;
-  color: white;
-  padding: 8px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-
-.print-icon:hover {
-  background: #3e8e41;
-}
-
-.print-icon svg {
-  width: 1em;
-  height: 1em;
 }
 
 .chat-icon {
@@ -714,15 +854,15 @@ body {
   width: 1em;
   height: 1em;
 }
-/* Form Container */
+
 .form-container {
   position: relative;
   background-color: white;
   padding: 30px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
-  width: 90%; /* Use percentage for responsiveness */
-  max-width: 1200px; /* Increased max-width for larger screens */
+  width: 90%;
+  max-width: 1200px;
   margin: 100px auto 20px;
   box-sizing: border-box;
 }
@@ -796,44 +936,15 @@ button:hover {
   margin: 2px 0;
 }
 
-/* For browsers that support styling options */
 .form-select option[style*="background-color"] {
   color: #333;
   font-weight: bold;
   text-shadow: 0 0 2px rgba(255,255,255,0.7);
 }
 
-.print-icon {
-  position: absolute;
-  bottom: 20px;
-  left: 20px;
-  font-size: 1.375rem;
-  background: #4caf50;
-  color: white;
-  padding: 8px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-}
-
-.chat-icon {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  font-size: 1.625rem;
-  background: #007bff;
-  color: white;
-  padding: 12px;
-  border-radius: 50%;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  z-index: 999;
-}
-
-/* Teeth Container */
 .teeth-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(60px, 1fr)); /* Responsive grid */
+  grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
   gap: 10px;
   justify-items: center;
   margin: 15px 0;
@@ -846,7 +957,7 @@ button:hover {
 }
 
 .tooth-img {
-  width: 40px; /* Slightly larger for better visibility */
+  width: 40px;
   height: auto;
   border: 2px solid transparent;
   border-radius: 10px;
@@ -879,6 +990,63 @@ button:hover {
   visibility: hidden;
 }
 
+.action-buttons {
+  display: flex;
+  gap: 15px;
+}
+
+.action-icon {
+  cursor: pointer;
+  color: #555;
+  transition: all 0.2s;
+  padding: 8px;
+  border-radius: 4px;
+}
+
+.action-icon:hover {
+  color: #0066cc;
+  background: #f0f0f0;
+}
+
+.action-icon svg {
+  width: 24px;
+  height: 24px;
+  display: block;
+}
+
+.print-icon {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  font-size: 1.375rem;
+  background: #4caf50;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.print-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #printable-area, #printable-area * {
+    visibility: visible;
+  }
+  #printable-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+}
+
 .description.visible {
   visibility: visible;
 }
@@ -890,7 +1058,6 @@ button:hover {
   margin-top: 5px;
 }
 
-/* Responsive Adjustments */
 @media (max-width: 768px) {
   .navbar-container {
     flex-direction: column;
@@ -907,7 +1074,7 @@ button:hover {
   .form-container {
     width: 95%;
     padding: 20px;
-    margin-top: 80px; /* Adjusted for smaller navbar */
+    margin-top: 80px;
   }
 
   .order-id-box {
@@ -969,4 +1136,28 @@ button:hover {
     width: 25px;
   }
 }
+
+.lab-selection-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.email-icon {
+  color: #666;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.email-icon:hover {
+  color: #0066cc;
+}
+
+.email-icon svg {
+  width: 1em;
+  height: 1em;
+}
 </style>
+```

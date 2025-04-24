@@ -253,13 +253,39 @@
         <span class="error" v-if="errors.images">{{ errors.images }}</span>
 
         <!-- Submit Button -->
-        <button type="submit">Submit</button>
-      </fieldset>
+        <button type="submit" @click="updateOrder">Update</button>
 
-      <!-- Print Icon -->
-      <div class="print-icon" @click="printForm" title="Print as PDF">
-        <font-awesome-icon icon="print" />
-        <font-awesome-icon icon="file-pdf" />
+      </fieldset>
+      <!-- Printable Area -->
+      <div class="print-area" ref="printableArea" style="display: none;">
+        <div class="print-container">
+          <h2>Order Details</h2>
+          <p><strong>Order ID:</strong> <span>{{ orderId || '--' }}</span></p>
+          <p><strong>Patient Name:</strong> <span>{{ orderData.patientName || '--' }}</span></p>
+          <p><strong>Gender:</strong> <span>{{ orderData.sex || '--' }}</span></p>
+          <p><strong>Age:</strong> <span>{{ orderData.age || '--' }}</span></p>
+          <p><strong>Status:</strong> <span>{{ orderData.prova ? 'Provisional' : 'Final' }}</span></p>
+          <p><strong>Scan File:</strong> <span>{{ orderData.scanFile ? 'Yes' : 'No' }}</span></p>
+          <p><strong>Number of Teeth:</strong> <span>{{ orderData.teethNo || '--' }}</span></p>
+          <p><strong>Selected Teeth:</strong> <span>{{ selectedTeeth.length > 0 ? selectedTeeth.join(', ') : '--' }}</span></p>
+          <p><strong>Lab:</strong> <span>{{ labs.find(lab => lab._id === orderData.labId)?.username || '--' }}</span></p>
+          <p><strong>Tooth Type:</strong> <span>{{ orderData.type || '--' }}</span></p>
+          <p><strong>Tooth Color:</strong> <span>{{ orderData.color || '--' }}</span></p>
+          <p><strong>Notes:</strong> <span>{{ orderData.description || '--' }}</span></p>
+          <p><strong>Price:</strong> <span>{{ formatCurrency(calculatedPrice) }}</span></p>
+          <p><strong>Deadline:</strong> <span>{{ orderData.deadline || '--' }}</span></p>
+          <p><strong>Media Files:</strong> <span>{{ orderData.media.length > 0 ? orderData.media.map(file => file.name).join(', ') : '--' }}</span></p>
+        </div>
+      </div>
+      <div class="action-buttons" style="margin-top: 25px">
+        <!-- Print Icon -->
+        <div class="action-icon" @click="printOrder" title="Print Order">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6 9V2H18V9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M6 18H4C2.89543 18 2 17.1046 2 16V11C2 9.89543 2.89543 9 4 9H20C21.1046 9 22 9.89543 22 11V16C22 17.1046 21.1046 18 20 18H18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M18 14H6V22H18V14Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
       </div>
     </form>
   </div>
@@ -274,6 +300,8 @@
 import labNavbar from "@/components/navbars/doctorNavbar.vue";
 import axios from "axios";
 import { format } from "date-fns";
+import { toast } from 'vue3-toastify';
+import 'vue3-toastify/dist/index.css';
 
 export default {
   name: "ShowOrder",
@@ -302,6 +330,8 @@ export default {
         deadline: "",
         video: null,
         images: [],
+        scanFile: false, // Added to match template
+        media: [], // Added to match template
       },
       selectedTeeth: [],
       labs: [],
@@ -313,10 +343,14 @@ export default {
       retryCount: 0,
       maxRetries: 3,
       upperTeeth: Array.from({ length: 16 }, (_, i) => 17 + i), // 17-32
-      lowerTeeth: Array.from({ length: 15 }, (_, i) => 1 + i), // 1-15
+      lowerTeeth: Array.from({ length: 16 }, (_, i) => 1 + i), // 1-16 (corrected to include 16)
     };
   },
   computed: {
+    calculatedPrice() {
+      // Placeholder: Implement actual price calculation if needed
+      return 0; // Replace with actual logic if available
+    },
     isAuthenticated() {
       return !!localStorage.getItem("token");
     },
@@ -352,7 +386,7 @@ export default {
           headers: { Authorization: `Bearer ${token}` },
           cancelToken: this.cancelToken.token,
         });
-        console.log(response.data);
+
         if (!response.data?.order) {
           throw new Error("Order data is empty");
         }
@@ -371,8 +405,10 @@ export default {
           labId: this.order.labId || "",
           description: this.order.description || "",
           deadline: this.order.deadline ? this.order.deadline.split("T")[0] : "",
-          video: null, // File inputs are not pre-filled
-          images: [], // File inputs are not pre-filled
+          video: null,
+          images: [],
+          scanFile: this.order.scanFile || false,
+          media: this.order.media || [],
         };
 
         // Set selected teeth
@@ -401,6 +437,161 @@ export default {
         this.loading = false;
       }
     },
+    formatCurrency(value) {
+      return new Intl.NumberFormat('en-JO', {
+        style: 'currency',
+        currency: 'JOD'
+      }).format(value || 0);
+    },
+    preparePrintContent() {
+      if (!this.$refs.printableArea) {
+        toast.error("Printable area not found. Please try again.");
+        return null;
+      }
+
+      const printStyles = `
+    @page {
+      size: A5;
+      margin: 5mm; /* Reduced from 10mm to save space */
+    }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      font-size: 8pt; /* Reduced from 10pt */
+      line-height: 1.2; /* Reduced from 1.4 */
+    }
+    .print-container {
+      padding: 5mm; /* Reduced from 10mm */
+      width: 100%;
+      box-sizing: border-box;
+      page-break-inside: avoid;
+      transform: scale(0.9); /* Slightly scale down to fit */
+      transform-origin: top left;
+    }
+    .print-container h2 {
+      font-size: 12pt; /* Reduced from 14pt */
+      margin-bottom: 5mm; /* Reduced from 10mm */
+      text-align: center;
+    }
+    .print-container p {
+      margin: 2mm 0; /* Reduced from 5mm */
+      padding: 2mm; /* Reduced from 5mm */
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid #eee;
+    }
+    .print-container p strong {
+      font-weight: bold;
+      flex: 1;
+    }
+    .print-container p span {
+      flex: 2;
+      text-align: left;
+    }
+    * {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+  `;
+
+      const printableElement = this.$refs.printableArea.cloneNode(true);
+      printableElement.style.display = 'block';
+
+      return { printStyles, printableElement };
+    },
+    executePrint({ printStyles, printableElement }) {
+      if (!printableElement) {
+        return;
+      }
+
+      const printWindow = window.open('', '_blank');
+      if (!printWindow) {
+        toast.error("Failed to open print window. Please allow popups for this site.");
+        return;
+      }
+
+      const htmlStart = '<html><head><title>Order Print</title><style>';
+      const htmlMiddle = '</style></head><body>';
+      const htmlEnd = '</body></html>';
+
+      printWindow.document.write(htmlStart + printStyles + htmlMiddle + printableElement.innerHTML + htmlEnd);
+      printWindow.document.close();
+
+      setTimeout(() => {
+        printWindow.print();
+        printWindow.close();
+      }, 200);
+    },
+    printOrder() {
+      this.$nextTick(() => {
+        const { printStyles, printableElement } = this.preparePrintContent();
+        if (printableElement) {
+          this.executePrint({ printStyles, printableElement });
+        }
+      });
+    },
+    async exportToPDF() {
+      if (!this.$refs.printableArea) {
+        toast.error("Printable area not found. Please try again.");
+        return;
+      }
+
+      const element = this.$refs.printableArea;
+      element.style.display = 'block'; // Temporarily show for PDF generation
+
+      const opt = {
+        margin: 10,
+        filename: `order_${this.orderId || Date.now()}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: {
+          scale: 2,
+          letterRendering: true,
+          useCORS: true
+        },
+        jsPDF: {
+          unit: 'mm',
+          format: 'a5',
+          orientation: 'portrait'
+        }
+      };
+
+      const pdfStyles = document.createElement('style');
+      pdfStyles.innerHTML = `
+        .print-container {
+          padding: 10mm;
+          font-size: 10pt;
+          line-height: 1.4;
+        }
+        .print-container h2 {
+          font-size: 14pt;
+          margin-bottom: 10mm;
+          text-align: center;
+        }
+        .print-container p {
+          margin: 5mm 0;
+          display: flex;
+          justify-content: space-between;
+          border-bottom: 1px solid #eee;
+          padding: 5mm;
+        }
+        .print-container p strong {
+          font-weight: bold;
+          flex: 1;
+        }
+        .print-container p span {
+          flex: 2;
+          text-align: left;
+        }
+      `;
+      element.appendChild(pdfStyles);
+
+      const html2pdf = (await import('html2pdf.js')).default;
+      html2pdf().from(element).set(opt).save();
+
+      element.removeChild(pdfStyles);
+      element.style.display = 'none'; // Restore hidden state
+    },
     toggleTooth(tooth) {
       if (this.selectedTeeth.includes(tooth)) {
         this.selectedTeeth = this.selectedTeeth.filter((t) => t !== tooth);
@@ -410,7 +601,6 @@ export default {
       this.orderData.teethNo = this.selectedTeeth.length;
     },
     formatNote() {
-      // Optional: Format the description (e.g., trim, capitalize)
       this.orderData.description = this.orderData.description.trim();
     },
     handleFileUpload(event, type) {
@@ -423,76 +613,58 @@ export default {
           delete this.errors.video;
         }
       } else if (type === "images") {
-        this.orderData.images = Array.from(files).slice(0, 3); // Limit to 3 images
+        this.orderData.images = Array.from(files).slice(0, 3);
         if (files.length > 3) {
           this.errors.images = "Maximum 3 images allowed";
         } else {
           delete this.errors.images;
         }
       }
+      this.orderData.media = [...this.orderData.images, ...(this.orderData.video ? [this.orderData.video] : [])];
     },
-    async submitOrder() {
-      this.errors = {};
-
-      // Basic validation
-      if (!this.orderData.patientName) this.errors.patientName = "Patient name is required";
-      if (!this.orderData.age) this.errors.age = "Age is required";
-      if (!this.orderData.teethNo) this.errors.teethNo = "At least one tooth must be selected";
-      if (!this.orderData.type) this.errors.type = "Tooth type is required";
-      if (!this.orderData.color) this.errors.color = "Color is required";
-      if (!this.orderData.labId) this.errors.labId = "Lab selection is required";
-      if (!this.orderData.deadline) this.errors.deadline = "Deadline is required";
-
-      if (Object.keys(this.errors).length > 0) {
-        return;
-      }
-
-      // Prepare form data
-      const formData = new FormData();
-      formData.append("prova", this.orderData.prova);
-      formData.append("patientName", this.orderData.patientName);
-      formData.append("sex", this.orderData.sex);
-      formData.append("age", this.orderData.age);
-      formData.append("teethNo", this.orderData.teethNo);
-      formData.append("teeth", JSON.stringify(this.selectedTeeth));
-      formData.append("type", this.orderData.type);
-      formData.append("color", this.orderData.color);
-      formData.append("labId", this.orderData.labId);
-      formData.append("description", this.orderData.description);
-      formData.append("deadline", this.orderData.deadline);
-
-      if (this.orderData.video) {
-        formData.append("video", this.orderData.video);
-      }
-      this.orderData.images.forEach((image) => {
-        formData.append(`images`, image);
-      });
-
+    async returnOrder() {
+      const orderId = this.$route.params.id;
+      const token = localStorage.getItem("token");
       try {
-        this.loading = true;
-        const token = localStorage.getItem("token");
-        await axios.put(`https://rr-5d46.onrender.com/docdash/order/${this.id}`, formData, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
-        });
-        alert("Order updated successfully!");
-        this.$router.push("/orders");
+        const response = await axios.post(
+            'https://rr-5d46.onrender.com/docdash/return-order',
+            { orderId: orderId },
+            { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        console.log(response);
+        toast.success("Order returned successfully");
       } catch (error) {
-        this.error = error.response?.data?.message || "Failed to update order";
-      } finally {
-        this.loading = false;
+        console.error("Return error:", error);
+        toast.error(error?.response?.data?.message || error.message);
       }
     },
-    printForm() {
-      window.print(); // Basic print functionality
-      // For PDF generation, you may need a library like jsPDF
-    },
+    async updateOrder() {
+      try {
+        const token = localStorage.getItem("token");
+        console.log("id: ", this.id);
+        const response = await axios.put(
+            `https://rr-5d46.onrender.com/docdash/update/${this.id}`,
+            this.orderData,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+        );
+
+        toast.success("Order updated successfully!");
+        console.log("Updated order:", response.data.order);
+        // Optionally refetch the order
+        this.fetchOrder();
+      } catch (error) {
+        console.error("Error updating order:", error);
+        toast.error(error.response?.data?.message || "Failed to update order");
+      }
+    }
   },
 };
 </script>
-
 <style scoped>
 body {
   font-family: Arial, sans-serif;
