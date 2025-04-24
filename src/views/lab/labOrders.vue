@@ -357,8 +357,10 @@ export default {
       if (!this.isValidPayment(order) || this.processingOrder) return;
 
       this.processingOrder = order._id;
+
       try {
         const token = localStorage.getItem("token");
+
         const response = await axios.patch(
             `${this.baseUrl}/update-prices`,
             {
@@ -366,16 +368,20 @@ export default {
               paied: Number(order.paid),
             },
             {
-              headers: { Authorization: `Bearer ${token}` }
+              headers: {
+                Authorization: `Bearer ${token}`
+              }
             }
         );
 
-        if (response.data.status === 200) {
-          toast.success('Price updated successfully');
+        // ✅ Check real HTTP status instead of custom data field
+        if (response.status === 200) {
+          toast.success(response.data.message || 'Price updated successfully');
+
           const updatedOrder = {
             ...order,
             paid: Number(order.paid),
-            updatedAt: new Date().toISOString()
+            updatedAt: new Date().toISOString(),
           };
 
           const orderIndex = this.orders.findIndex(o => o._id === order._id);
@@ -384,8 +390,10 @@ export default {
             this.filteredOrders = [...this.orders];
           }
         } else {
+          // Fallback in case status is not 200 (just in case)
           throw new Error(response.data.message || 'Failed to update price');
         }
+
       } catch (error) {
         console.error('Error updating price:', error);
         toast.error(error.response?.data?.message || error.message || 'Failed to update price');
@@ -394,6 +402,7 @@ export default {
         this.processingOrder = null;
       }
     },
+
     async markOrderAsReady(orderId) {
       this.processingOrder = orderId;
       try {
