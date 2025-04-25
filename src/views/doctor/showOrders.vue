@@ -25,6 +25,12 @@
             required
         />
         <span class="error" v-if="errors.patientName">{{ errors.patientName }}</span>
+        <label>Return Order</label>
+        <h6 v-if="orderData.returned === 'true'" style="color: red;">Order Is Returned to Lab</h6>
+        <select v-model="orderData.returned">
+          <option value="false">Not Returned</option>
+          <option value="true">Return It</option>
+        </select>
 
         <!-- Gender -->
         <label for="patientGender">Gender:</label>
@@ -327,6 +333,7 @@ export default {
         color: "",
         labId: "",
         description: "",
+        returned: false,
         deadline: "",
         video: null,
         images: [],
@@ -400,6 +407,7 @@ export default {
           sex: this.order.sex || "male",
           age: this.order.age || null,
           teethNo: this.order.teethNo || 0,
+          returned: this.order.returned,
           type: this.order.type || "",
           color: this.order.color || "",
           labId: this.order.labId || "",
