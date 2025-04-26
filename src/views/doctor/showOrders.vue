@@ -987,4 +987,139 @@ button:hover {
     font-size: 0.5rem;
   }
 }
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden;
+  margin: 0 auto;
+  padding-top: 80px;
+}
+
+/* Form Container */
+.form-container {
+  position: relative;
+  background-color: white;
+  padding: 2rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  width: 90%;
+  max-width: 1200px;
+  margin: 6rem auto 1.5rem;
+  box-sizing: border-box;
+}
+
+/* Teeth Containers */
+.teeth-container {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  gap: 0.75rem;
+  margin: 1rem 0;
+  padding: 0.5rem;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #ccc #f4f4f4;
+}
+
+.teeth-container::-webkit-scrollbar {
+  height: 8px;
+}
+
+.teeth-container::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 4px;
+}
+
+.teeth-container::-webkit-scrollbar-track {
+  background-color: #f4f4f4;
+}
+
+.tooth-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.tooth-img {
+  width: 3rem;
+  height: 3rem;
+  object-fit: contain;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.tooth-img:hover {
+  opacity: 0.8;
+}
+
+.tooth-img.selected {
+  border: 2px solid #4CAF50;
+  box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+  opacity: 1;
+}
+
+.tooth-number {
+  font-size: 0.75rem;
+  font-weight: bold;
+  margin-top: 0.25rem;
+  text-align: center;
+  color: #333;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1024px) {
+  .form-container {
+    padding: 1.5rem;
+    margin-top: 5rem;
+  }
+
+  .tooth-img {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  body {
+    padding-top: 70px;
+  }
+
+  .form-container {
+    width: 95%;
+    padding: 1.25rem;
+    margin-top: 4rem;
+  }
+
+  .tooth-img {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+
+  .tooth-number {
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .form-container {
+    padding: 1rem;
+    margin-top: 3.5rem;
+  }
+
+  .tooth-img {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .tooth-number {
+    font-size: 0.65rem;
+  }
+}
+
 </style>
