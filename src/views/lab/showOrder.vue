@@ -681,6 +681,7 @@ export default {
 </script>
 
 <style scoped>
+/* Base Styles */
 body {
   font-family: Arial, sans-serif;
   background-color: #f4f4f4;
@@ -692,7 +693,32 @@ body {
   padding-top: 80px;
 }
 
-/* Form Container */
+.chat-icon {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  font-size: 1.625rem;
+  background: #007bff;
+  color: white;
+  padding: 12px;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chat-icon:hover {
+  background: #0069d9;
+}
+
+.chat-icon svg {
+  width: 1em;
+  height: 1em;
+}
+
 .form-container {
   position: relative;
   background-color: white;
@@ -769,65 +795,29 @@ button:hover {
   text-align: center;
 }
 
-.print-icon {
-  position: absolute;
-  bottom: 20px;
-  left: 20px;
-  font-size: 1.375rem;
-  background: #4caf50;
-  color: white;
-  padding: 8px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+.form-select option {
+  padding: 8px;
+  margin: 2px 0;
 }
 
-.chat-icon {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  font-size: 1.625rem;
-  background: #007bff;
-  color: white;
-  padding: 12px;
-  border-radius: 50%;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  z-index: 999;
+.form-select option[style*="background-color"] {
+  color: #333;
+  font-weight: bold;
+  text-shadow: 0 0 2px rgba(255,255,255,0.7);
 }
 
-/* Teeth Container */
 .teeth-container {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  flex-wrap: nowrap;
-  overflow-x: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
   gap: 10px;
+  justify-items: center;
   margin: 15px 0;
-  padding: 10px;
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
-}
-
-.teeth-container::-webkit-scrollbar {
-  height: 8px;
-}
-
-.teeth-container::-webkit-scrollbar-thumb {
-  background-color: #ccc;
-  border-radius: 4px;
-}
-
-.teeth-container::-webkit-scrollbar-track {
-  background-color: #f4f4f4;
 }
 
 .tooth-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
-  flex: 0 0 auto;
 }
 
 .tooth-img {
@@ -864,6 +854,63 @@ button:hover {
   visibility: hidden;
 }
 
+.action-buttons {
+  display: flex;
+  gap: 15px;
+}
+
+.action-icon {
+  cursor: pointer;
+  color: #555;
+  transition: all 0.2s;
+  padding: 8px;
+  border-radius: 4px;
+}
+
+.action-icon:hover {
+  color: #0066cc;
+  background: #f0f0f0;
+}
+
+.action-icon svg {
+  width: 24px;
+  height: 24px;
+  display: block;
+}
+
+.print-icon {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  font-size: 1.375rem;
+  background: #4caf50;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.print-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #printable-area, #printable-area * {
+    visibility: visible;
+  }
+  #printable-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+}
+
 .description.visible {
   visibility: visible;
 }
@@ -875,8 +922,7 @@ button:hover {
   margin-top: 5px;
 }
 
-/* Responsive Adjustments */
-@media (max-width: 768px) {
+@media (max-width: 1200px) {
   .navbar-container {
     flex-direction: column;
     align-items: flex-start;
@@ -910,12 +956,11 @@ button:hover {
   }
 
   .teeth-container {
-    gap: 8px;
-    padding: 8px;
+    grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
   }
 
   .tooth-img {
-    width: 30px;
+    width: 20px;
   }
 
   .tooth-number {
@@ -923,7 +968,7 @@ button:hover {
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 1199px) {
   .navbar-logo {
     font-size: 1.25rem;
   }
@@ -948,130 +993,61 @@ button:hover {
   }
 
   .teeth-container {
-    gap: 6px;
-    padding: 6px;
+    grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
   }
 
   .tooth-img {
     width: 25px;
   }
-
-  .tooth-number {
-    font-size: 0.5rem;
-  }
-}
-body {
-  font-family: Arial, sans-serif;
-  background-color: #f4f4f4;
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  overflow-x: hidden;
-  margin: 0 auto;
-  padding-top: 80px;
 }
 
-/* Form Container */
-.form-container {
-  position: relative;
-  background-color: white;
-  padding: 2rem;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  width: 90%;
-  max-width: 1200px;
-  margin: 6rem auto 1.5rem;
-  box-sizing: border-box;
+.lab-selection-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-/* Teeth Containers */
+.email-icon {
+  color: #666;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.email-icon:hover {
+  color: #0066cc;
+}
+
+.email-icon svg {
+  width: 1em;
+  height: 1em;
+}
 .teeth-container {
   display: flex;
   flex-wrap: nowrap;
   overflow-x: auto;
-  gap: 0.75rem;
-  margin: 1rem 0;
-  padding: 0.5rem;
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
-  scrollbar-color: #ccc #f4f4f4;
-}
-
-.teeth-container::-webkit-scrollbar {
-  height: 8px;
-}
-
-.teeth-container::-webkit-scrollbar-thumb {
-  background-color: #ccc;
-  border-radius: 4px;
-}
-
-.teeth-container::-webkit-scrollbar-track {
-  background-color: #f4f4f4;
+  justify-content: center;
+  gap: 10px;
+  margin: 15px 0;
+  padding: 10px 0;
 }
 
 .tooth-wrapper {
+  flex: 0 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
-  flex: 0 0 auto;
 }
 
-.tooth-img {
-  width: 3rem;
-  height: 3rem;
-  object-fit: contain;
-  border: 2px solid transparent;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-}
-
-.tooth-img:hover {
-  opacity: 0.8;
-}
-
-.tooth-img.selected {
-  border: 2px solid #4CAF50;
-  box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
-  opacity: 1;
-}
-
-.tooth-number {
-  font-size: 0.75rem;
-  font-weight: bold;
-  margin-top: 0.25rem;
-  text-align: center;
-  color: #333;
-}
-
-/* Responsive Adjustments */
+/* For tablet view specifically */
 @media (max-width: 1024px) {
-  .form-container {
-    padding: 1.5rem;
-    margin-top: 5rem;
+  .teeth-container {
+    gap: 8px;
   }
 
   .tooth-img {
-    width: 2.5rem;
-    height: 2.5rem;
-  }
-}
-
-@media (max-width: 768px) {
-  body {
-    padding-top: 70px;
-  }
-
-  .form-container {
-    width: 95%;
-    padding: 1.25rem;
-    margin-top: 4rem;
-  }
-
-  .tooth-img {
-    width: 2.25rem;
-    height: 2.25rem;
+    width: 30px;
   }
 
   .tooth-number {
@@ -1079,20 +1055,20 @@ body {
   }
 }
 
-@media (max-width: 480px) {
-  .form-container {
-    padding: 1rem;
-    margin-top: 3.5rem;
+/* For mobile view */
+@media (max-width: 768px) {
+  .teeth-container {
+    gap: 5px;
   }
 
   .tooth-img {
-    width: 2rem;
-    height: 2rem;
+    width: 25px;
   }
 
   .tooth-number {
-    font-size: 0.65rem;
+    font-size: 0.6rem;
   }
 }
+
 
 </style>
