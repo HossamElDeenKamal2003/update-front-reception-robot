@@ -960,4 +960,269 @@ button:hover {
     font-size: 0.5rem;
   }
 }
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden;
+  margin: 0 auto;
+  padding-top: 80px;
+}
+
+/* Form Container */
+.form-container {
+  position: relative;
+  background-color: white;
+  padding: 30px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  width: 90%;
+  max-width: 1200px;
+  margin: 100px auto 20px;
+  box-sizing: border-box;
+}
+
+fieldset {
+  border: none;
+  margin-bottom: 15px;
+}
+
+label,
+legend {
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+textarea {
+  height: 100px;
+  resize: vertical;
+}
+
+button {
+  background-color: #4caf50;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 100%;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+.file-input {
+  padding: 0;
+}
+
+.order-id-box {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background-color: #4caf50;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: bold;
+  text-align: center;
+}
+
+.chat-icon {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  font-size: 1.625rem;
+  background: #007bff;
+  color: white;
+  padding: 12px;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 999;
+}
+
+/* Teeth Container */
+.teeth-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap; /* Changed to wrap for better mobile experience */
+  justify-content: center;
+  gap: 10px;
+  margin: 15px 0;
+  padding: 10px;
+}
+
+.tooth-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.tooth-img {
+  width: 40px;
+  height: auto;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.tooth-img:hover {
+  opacity: 0.7;
+}
+
+.tooth-img.selected {
+  border: 2px solid rgb(0, 255, 4);
+  box-shadow: 0 0 10px rgba(12, 204, 48, 0.5);
+  opacity: 1;
+}
+
+.tooth-number {
+  font-size: 0.75rem;
+  font-weight: bold;
+  margin-top: 3px;
+  text-align: center;
+}
+
+.description {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 1.125rem;
+  color: #333;
+  visibility: hidden;
+}
+
+.description.visible {
+  visibility: visible;
+}
+
+.error {
+  color: red;
+  font-size: 0.875rem;
+  display: block;
+  margin-top: 5px;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .form-container {
+    width: 95%;
+    padding: 20px;
+    margin-top: 80px;
+  }
+
+  .order-id-box {
+    position: static; /* Prevent overlap on smaller screens */
+    margin: 0 auto 20px;
+    width: fit-content;
+    font-size: 0.875rem;
+    padding: 8px 12px;
+  }
+
+  .teeth-container {
+    gap: 8px;
+    padding: 8px;
+    justify-content: space-around; /* Better spacing with wrap */
+  }
+
+  .tooth-wrapper {
+    flex: 0 0 15%; /* Roughly 5 teeth per row */
+  }
+
+  .tooth-img {
+    width: 30px;
+  }
+
+  .tooth-number {
+    font-size: 0.625rem;
+  }
+
+  .chat-icon {
+    font-size: 1.25rem;
+    padding: 8px;
+    bottom: 15px;
+    right: 15px;
+  }
+}
+
+@media (max-width: 600px) {
+  .tooth-wrapper {
+    flex: 0 0 20%; /* Roughly 4 teeth per row */
+  }
+
+  .tooth-img {
+    width: 28px;
+  }
+
+  .form-container {
+    padding: 15px;
+  }
+
+  textarea {
+    height: 80px; /* Reduce textarea height on smaller screens */
+  }
+}
+
+@media (max-width: 480px) {
+  .form-container {
+    padding: 12px;
+  }
+
+  label,
+  legend {
+    font-size: 0.75rem; /* Further reduce font size */
+  }
+
+  input,
+  select,
+  textarea {
+    padding: 6px;
+    font-size: 0.875rem;
+  }
+
+  button {
+    padding: 8px;
+  }
+
+  .teeth-container {
+    gap: 6px;
+    padding: 6px;
+  }
+
+  .tooth-wrapper {
+    flex: 0 0 25%; /* Roughly 3 teeth per row */
+  }
+
+  .tooth-img {
+    width: 25px;
+  }
+
+  .tooth-number {
+    font-size: 0.5rem;
+  }
+
+  .chat-icon {
+    font-size: 1rem;
+    padding: 6px;
+    bottom: 10px;
+    right: 10px;
+  }
+}
 </style>
