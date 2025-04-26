@@ -434,47 +434,43 @@ export default {
 
       const printStyles = `
     @page {
-      size: A5;
-      margin: 5mm; /* Reduced from 10mm to save space */
+      size: auto;
+      margin: 5mm;
     }
     body {
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
-      font-size: 8pt; /* Reduced from 10pt */
-      line-height: 1.2; /* Reduced from 1.4 */
+      font-size: 10pt;
+      line-height: 1.4;
+      -webkit-text-size-adjust: 100%; /* Prevent iOS text size adjust */
     }
     .print-container {
-      padding: 5mm; /* Reduced from 10mm */
+      padding: 10mm;
       width: 100%;
       box-sizing: border-box;
-      page-break-inside: avoid;
-      transform: scale(0.9); /* Slightly scale down to fit */
-      transform-origin: top left;
     }
     .print-container h2 {
-      font-size: 12pt; /* Reduced from 14pt */
-      margin-bottom: 5mm; /* Reduced from 10mm */
+      font-size: 14pt;
+      margin-bottom: 10mm;
       text-align: center;
     }
     .print-container p {
-      margin: 2mm 0; /* Reduced from 5mm */
-      padding: 2mm; /* Reduced from 5mm */
+      margin: 3mm 0;
+      padding: 2mm;
       display: flex;
       justify-content: space-between;
       border-bottom: 1px solid #eee;
-    }
-    .print-container p strong {
-      font-weight: bold;
-      flex: 1;
-    }
-    .print-container p span {
-      flex: 2;
-      text-align: left;
+      page-break-inside: avoid;
     }
     * {
-      -webkit-print-color-adjust: exact;
-      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+    @media print {
+      .no-print, .no-print * {
+        display: none !important;
+      }
     }
   `;
 
@@ -509,9 +505,47 @@ export default {
     printOrder() {
       this.$nextTick(() => {
         const { printStyles, printableElement } = this.preparePrintContent();
-        if (printableElement) {
-          this.executePrint({ printStyles, printableElement });
-        }
+        if (!printableElement) return;
+
+        // Create an iframe instead of a new window
+        const iframe = document.createElement('iframe');
+        iframe.style.position = 'absolute';
+        iframe.style.width = '1px';
+        iframe.style.height = '1px';
+        iframe.style.left = '-9999px';
+        iframe.style.top = '-9999px';
+        iframe.style.border = 'none';
+
+        document.body.appendChild(iframe);
+
+        const doc = iframe.contentDocument || iframe.contentWindow.document;
+        doc.open();
+        doc.write(`
+      <html>
+        <head>
+          <title>Order Print</title>
+          <style>${printStyles}</style>
+        </head>
+        <body>${printableElement.innerHTML}</body>
+      </html>
+    `);
+        doc.close();
+
+        // Use contentWindow's print method
+        const iframeWindow = iframe.contentWindow;
+
+        // Mobile-specific delay
+        const printDelay = /Mobile|Android|iP(hone|od|ad)/.test(navigator.userAgent) ? 1000 : 200;
+
+        setTimeout(() => {
+          iframeWindow.focus();
+          iframeWindow.print();
+
+          // Remove iframe after printing
+          setTimeout(() => {
+            document.body.removeChild(iframe);
+          }, 1000);
+        }, printDelay);
       });
     },
     async exportToPDF() {
@@ -658,7 +692,6 @@ body {
   padding-top: 80px;
 }
 
-
 /* Form Container */
 .form-container {
   position: relative;
@@ -666,8 +699,8 @@ body {
   padding: 30px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
-  width: 90%; /* Use percentage for responsiveness */
-  max-width: 1200px; /* Increased max-width for larger screens */
+  width: 90%;
+  max-width: 1200px;
   margin: 100px auto 20px;
   box-sizing: border-box;
 }
@@ -765,21 +798,40 @@ button:hover {
 
 /* Teeth Container */
 .teeth-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(60px, 1fr)); /* Responsive grid */
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  flex-wrap: nowrap;
+  overflow-x: auto;
   gap: 10px;
-  justify-items: center;
   margin: 15px 0;
+  padding: 10px;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+.teeth-container::-webkit-scrollbar {
+  height: 8px;
+}
+
+.teeth-container::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 4px;
+}
+
+.teeth-container::-webkit-scrollbar-track {
+  background-color: #f4f4f4;
 }
 
 .tooth-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
+  flex: 0 0 auto;
 }
 
 .tooth-img {
-  width: 40px; /* Slightly larger for better visibility */
+  width: 40px;
   height: auto;
   border: 2px solid transparent;
   border-radius: 10px;
@@ -840,7 +892,7 @@ button:hover {
   .form-container {
     width: 95%;
     padding: 20px;
-    margin-top: 80px; /* Adjusted for smaller navbar */
+    margin-top: 80px;
   }
 
   .order-id-box {
@@ -858,7 +910,8 @@ button:hover {
   }
 
   .teeth-container {
-    grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
+    gap: 8px;
+    padding: 8px;
   }
 
   .tooth-img {
@@ -895,11 +948,16 @@ button:hover {
   }
 
   .teeth-container {
-    grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
+    gap: 6px;
+    padding: 6px;
   }
 
   .tooth-img {
     width: 25px;
+  }
+
+  .tooth-number {
+    font-size: 0.5rem;
   }
 }
 </style>

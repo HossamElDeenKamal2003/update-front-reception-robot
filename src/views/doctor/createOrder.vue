@@ -81,6 +81,7 @@
               <path d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               <path d="M22 6L12 13L2 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
+           
           </a>
         </div>
         <span class="error" v-if="errors.labId">{{ errors.labId }}</span>
@@ -106,7 +107,7 @@
         </div>
 
         <!-- Upper Teeth (17-32) -->
-        <div class="teeth-container">
+        <div class="teeth-container upper-teeth">
           <div class="tooth-wrapper">
             <img src="../../assets/img/17.jpeg" alt="Tooth 17" class="tooth-img" :class="{ selected: selectedTeeth.includes(17) }" @click="toggleTooth(17)">
             <div class="tooth-number">17</div>
@@ -174,7 +175,7 @@
         </div>
 
         <!-- Lower Teeth (1-15) -->
-        <div class="teeth-container">
+        <div class="teeth-container lower-teeth">
           <div class="tooth-wrapper">
             <img src="../../assets/img/1.jpeg" alt="Tooth 1" class="tooth-img" :class="{ selected: selectedTeeth.includes(1) }" @click="toggleTooth(1)">
             <div class="tooth-number">1</div>
@@ -236,14 +237,14 @@
             <div class="tooth-number">15</div>
           </div>
           <div class="tooth-wrapper">
-            <img src="../../assets/img/1.jpeg" alt="Tooth 1" class="tooth-img" :class="{ selected: selectedTeeth.includes(1) }" @click="toggleTooth(1)">
+            <img src="../../assets/img/1.jpeg" alt="Tooth 1" class="tooth-img" :class="{ selected: selectedTeeth.includes(1) }" @click="toggleTooth(16)">
             <div class="tooth-number">16</div>
           </div>
         </div>
 
         <!-- Color -->
         <label for="color">Tooth Color:</label>
-        <select id="color" class="form-select" v-model="orderData.color" required>
+        <select v-if="!orderData.prova" id="color" class="form-select" v-model="orderData.color" required>
           <option value="" disabled>Select a color</option>
           <option
               v-for="color in availableColors"
@@ -439,6 +440,16 @@ export default {
   },
   created() {
     this.fetchLabs();
+  },
+  watch: {
+    'orderData.scanFile': function(newVal) {
+      console.log('scanFile changed to:', newVal);
+      console.log('labId:', this.orderData.labId);
+    },
+    'orderData.labId': function(newVal) {
+      console.log('labId changed to:', newVal);
+      console.log('scanFile:', this.orderData.scanFile);
+    }
   },
   methods: {
     async fetchLabs() {
@@ -1058,7 +1069,7 @@ button:hover {
   margin-top: 5px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1200px) {
   .navbar-container {
     flex-direction: column;
     align-items: flex-start;
@@ -1096,7 +1107,7 @@ button:hover {
   }
 
   .tooth-img {
-    width: 30px;
+    width: 20px;
   }
 
   .tooth-number {
@@ -1104,7 +1115,7 @@ button:hover {
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 1199px) {
   .navbar-logo {
     font-size: 1.25rem;
   }
@@ -1158,6 +1169,52 @@ button:hover {
 .email-icon svg {
   width: 1em;
   height: 1em;
+}
+.teeth-container {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  justify-content: center;
+  gap: 10px;
+  margin: 15px 0;
+  padding: 10px 0;
+}
+
+.tooth-wrapper {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* For tablet view specifically */
+@media (max-width: 1024px) {
+  .teeth-container {
+    gap: 8px;
+  }
+
+  .tooth-img {
+    width: 30px;
+  }
+
+  .tooth-number {
+    font-size: 0.7rem;
+  }
+}
+
+/* For mobile view */
+@media (max-width: 768px) {
+  .teeth-container {
+    gap: 5px;
+  }
+
+  .tooth-img {
+    width: 25px;
+  }
+
+  .tooth-number {
+    font-size: 0.6rem;
+  }
 }
 </style>
 ```
