@@ -46,11 +46,6 @@
             <span class="radio-custom"></span>
             Delivery
           </label>
-<!--          <label class="radio-option">-->
-<!--            <input type="radio" name="userType" value="user" v-model="userType">-->
-<!--            <span class="radio-custom"></span>-->
-<!--            User-->
-<!--          </label>-->
         </div>
         <div v-if="userTypeError" class="error-message">{{ userTypeError }}</div>
       </div>
@@ -58,7 +53,7 @@
       <button type="submit" class="submit-btn">Login</button>
 
       <div class="form-footer">
-        <a href="#" class="forgot-password">Forgot password?</a>
+<!--        <a href="#" class="forgot-password">Forgot password?</a>-->
         <span>Don't have an account? <a href="/register" class="signup-link">Sign up</a></span>
       </div>
     </form>

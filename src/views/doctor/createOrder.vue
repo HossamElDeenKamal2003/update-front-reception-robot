@@ -244,7 +244,7 @@
 
         <!-- Color -->
         <label for="color">Tooth Color:</label>
-        <select v-if="!orderData.prova" id="color" class="form-select" v-model="orderData.color" required>
+        <select v-if="!orderData.prova" id="color" class="form-select" v-model="orderData.color">
           <option value="" disabled>Select a color</option>
           <option
               v-for="color in availableColors"
@@ -285,27 +285,27 @@
         <span class="error" v-if="errors.deadline">{{ errors.deadline }}</span>
 
         <!-- Audio -->
-        <label for="audio">Audio Recording:</label>
-        <input
-            type="file"
-            id="audio"
-            accept="audio/*"
-            class="file-input"
-            @change="handleFileUpload($event, 'video')"
-        />
-        <span class="error" v-if="errors.video">{{ errors.video }}</span>
+<!--        <label for="audio">Audio Recording:</label>-->
+<!--        <input-->
+<!--            type="file"-->
+<!--            id="audio"-->
+<!--            accept="audio/*"-->
+<!--            class="file-input"-->
+<!--            @change="handleFileUpload($event, 'video')"-->
+<!--        />-->
+<!--        <span class="error" v-if="errors.video">{{ errors.video }}</span>-->
 
-        <!-- Images -->
-        <label for="photo">Images (up to 3):</label>
-        <input
-            type="file"
-            id="photo"
-            accept="image/*"
-            class="file-input"
-            multiple
-            @change="handleFileUpload($event, 'images')"
-        />
-        <span class="error" v-if="errors.images">{{ errors.images }}</span>
+<!--        &lt;!&ndash; Images &ndash;&gt;-->
+<!--        <label for="photo">Images (up to 3):</label>-->
+<!--        <input-->
+<!--            type="file"-->
+<!--            id="photo"-->
+<!--            accept="image/*"-->
+<!--            class="file-input"-->
+<!--            multiple-->
+<!--            @change="handleFileUpload($event, 'images')"-->
+<!--        />-->
+<!--        <span class="error" v-if="errors.images">{{ errors.images }}</span>-->
 
         <!-- Submit Button -->
         <button type="submit">Submit</button>
@@ -576,7 +576,6 @@ export default {
         "age",
         "sex",
         "teethNo",
-        "color",
         "type",
         "deadline",
         "labId",
