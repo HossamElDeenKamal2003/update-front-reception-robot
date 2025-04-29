@@ -25,11 +25,11 @@
       </div>
 
       <div class="form-group">
-        <label for="username">Username</label>
+        <label for="phone">{{ userType === 'doctor' ? 'Clinic Name' : 'Lab Number' }}</label>
         <input
             type="text"
             id="username"
-            placeholder="Enter Username"
+            :placeholder="userType === 'doctor' ? 'Enter Clinic Name' : 'Enter Lab Name'"
             v-model="username"
             required
         >
