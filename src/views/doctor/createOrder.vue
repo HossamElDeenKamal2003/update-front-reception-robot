@@ -244,7 +244,7 @@
 
         <!-- Color -->
         <label for="color">Tooth Color:</label>
-        <select v-if="!orderData.prova" id="color" class="form-select" v-model="orderData.color">
+        <select id="color" class="form-select" v-model="orderData.color" :required="!orderData.prova">
           <option value="" disabled>Select a color</option>
           <option
               v-for="color in availableColors"
@@ -587,7 +587,11 @@ export default {
           isValid = false;
         }
       });
-
+      // Add color validation only for final orders
+      if (!this.orderData.prova && !this.orderData.color) {
+        this.errors.color = "Color is required for final orders";
+        isValid = false;
+      }
       if (this.orderData.age && (this.orderData.age < 0 || this.orderData.age > 120)) {
         this.errors.age = "Please enter a valid age";
         isValid = false;
