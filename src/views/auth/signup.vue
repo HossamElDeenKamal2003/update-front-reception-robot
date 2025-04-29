@@ -1,5 +1,9 @@
 <template>
+  <div>
+    <h2 style="color: red">ملاحظة : يرجى تزويدنا بموقعك الدقيق لتسهيل عملية التوصيل</h2>
+  </div>
   <div class="signup-container">
+
     <form @submit.prevent="handleSubmit" class="signup-form">
       <h2 class="form-title">Sign Up</h2>
 
@@ -33,11 +37,11 @@
       </div>
 
       <div class="form-group">
-        <label for="phone">Phone Number</label>
+        <label for="phone">{{ userType === 'doctor' ? 'Clinic Number' : 'Phone Number' }}</label>
         <input
             type="tel"
             id="phone"
-            placeholder="Enter Phone Number"
+            :placeholder="userType === 'doctor' ? 'Enter Clinic Number' : 'Enter Phone Number'"
             v-model="phoneNumber"
             required
         >
