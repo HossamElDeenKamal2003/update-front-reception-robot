@@ -20,9 +20,21 @@ const routes = [
   },
   {
     path: '/create-order',
-    name: "create-order",
+    name: 'create-order',
     component: NewOrder,
+    beforeEnter: (to, from, next) => {
+      const role = localStorage.getItem('role');
+      if (role === 'doctor') {
+        console.log(role);
+        next(); // allow access
+      } else {
+        next('/login'); // cancel navigation
+        // Optionally redirect:
+        // next('/not-authorized');
+      }
+    }
   },
+
   {
     path: '/login',
     name: "login",
@@ -34,10 +46,21 @@ const routes = [
     component: SignupComponent,
   },
   {
-    path: "/doctor/orders",
-    name: "AllOrders",
+    path: '/doctor/orders',
+    name: 'AllOrders',
     component: AllOrders,
+    beforeEnter: (to, from, next) => {
+      const role = localStorage.getItem('role');
+      if (role === 'doctor') {
+        next(); // allow access
+      } else {
+        next('/login'); // cancel navigation
+        // Or optionally:
+        // next('/login');
+      }
+    }
   },
+
   {
     path: '/orders/:id',
     name: 'showOrder',

@@ -2,7 +2,7 @@
   <div>
     <nav-no-anim />
     <div class="content">
-      <h2>Orders</h2>
+      <h2>الطلبات</h2>
 
       <div class="controls">
         <div class="search-box">
@@ -10,22 +10,22 @@
               type="text"
               v-model="searchTerm"
               @input="handleSearch"
-              placeholder="Search orders..."
+              placeholder="البحث في الطلبات..."
           >
           <select v-model="searchField">
-            <option value="all">All Fields</option>
-            <option value="UID">Order ID</option>
-            <option value="patientName">Patient Name</option>
-            <option value="status">Status</option>
-            <option value="doctor">Doctor</option>
+            <option value="all">جميع الحقول</option>
+            <option value="UID">رقم الطلب</option>
+            <option value="patientName">اسم المريض</option>
+            <option value="status">الحالة</option>
+            <option value="doctor">الطبيب</option>
           </select>
         </div>
 
         <div class="date-filter">
           <input type="date" v-model="startDate" @change="applyFilters">
-          <span>to</span>
+          <span>إلى</span>
           <input type="date" v-model="endDate" @change="applyFilters">
-          <button @click="clearDateFilter">Clear Dates</button>
+          <button @click="clearDateFilter">مسح التواريخ</button>
         </div>
 
         <div class="status-filters">
@@ -40,7 +40,7 @@
         </div>
       </div>
 
-      <div v-if="loading" class="loading">Loading orders...</div>
+      <div v-if="loading" class="loading">جاري تحميل الطلبات...</div>
       <div v-else-if="error" class="error">{{ error }}</div>
 
       <div v-else class="order-cards">
@@ -50,18 +50,18 @@
             class="card"
             :class="statusClass(order.status)"
         >
-          <h3>Order #{{ order.UID }}</h3>
-          <p><strong>Patient Name:</strong> {{ order.patientName }}</p>
-          <p><strong>Status:</strong> {{ order.status }}</p>
-          <p><strong>Price:</strong> {{ order.price }}</p>
-          <p><strong>Paid:</strong> {{ order.paid }}</p>
-          <p><strong>rest:</strong> {{ order.rest }}</p>
-          <p><strong>Last Updated:</strong> {{ formatDate(order.updatedAt) }}</p>
+          <h3>طلب رقم #{{ order.UID }}</h3>
+          <p><strong>اسم المريض:</strong> {{ order.patientName }}</p>
+          <p><strong>الحالة:</strong> {{ order.status }}</p>
+          <p><strong>السعر:</strong> {{ order.price }}</p>
+          <p><strong>المدفوع:</strong> {{ order.paid }}</p>
+          <p><strong>المتبقي:</strong> {{ order.rest }}</p>
+          <p><strong>آخر تحديث:</strong> {{ formatDate(order.updatedAt) }}</p>
           <router-link
               :to="{ name: 'showOrder', params: { id: order._id } }"
               class="view-order-btn"
           >
-            View Order Details
+            عرض تفاصيل الطلب
           </router-link>
         </div>
       </div>
@@ -71,14 +71,14 @@
             @click="currentPage--"
             :disabled="currentPage === 1"
         >
-          Previous
+          السابق
         </button>
-        <span>Page {{ currentPage }} of {{ totalPages }}</span>
+        <span>صفحة {{ currentPage }} من {{ totalPages }}</span>
         <button
             @click="currentPage++"
             :disabled="currentPage === totalPages"
         >
-          Next
+          التالي
         </button>
       </div>
     </div>
@@ -88,7 +88,6 @@
     </div>
   </div>
 </template>
-
 <script>
 import NavNoAnim from "@/components/navbars/doctorNavbar.vue";
 import axios from "axios";

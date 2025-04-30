@@ -1,23 +1,23 @@
 <template>
   <labNavbar />
-  <!-- Form Container -->
+  <!-- حاوية النموذج -->
   <div class="form-container" ref="formContainer">
-    <div class="order-id-box">{{ orderId || 'Order ID: --' }}</div>
+    <div class="order-id-box">{{ orderId || 'رقم الطلب: --' }}</div>
 
     <form @submit.prevent="submitOrder">
       <fieldset>
-        <legend>Patient Information</legend>
+        <legend>معلومات المريض</legend>
 
-        <!-- Status -->
-        <label for="status">Status:</label>
+        <!-- الحالة -->
+        <label for="status">الحالة:</label>
         <select v-model="orderData.prova" id="status">
-          <option :value="true">Provisional</option>
-          <option :value="false">Final</option>
+          <option :value="true">مؤقت</option>
+          <option :value="false">نهائي</option>
         </select>
         <span class="error" v-if="errors.prova">{{ errors.prova }}</span>
 
-        <!-- Patient Name -->
-        <label for="patientName">Patient's Name:</label>
+        <!-- اسم المريض -->
+        <label for="patientName">اسم المريض:</label>
         <input
             type="text"
             id="patientName"
@@ -25,23 +25,23 @@
             required
         />
         <span class="error" v-if="errors.patientName">{{ errors.patientName }}</span>
-        <label>Return Order</label>
-        <h6 v-if="orderData.returned === 'true'" style="color: red;">Order Is Returned to Lab</h6>
+        <label>طلب إرجاع</label>
+        <h6 v-if="orderData.returned === 'true'" style="color: red;">تم إرجاع الطلب إلى المعمل</h6>
         <select v-model="orderData.returned">
-          <option value="false">Not Returned</option>
-          <option value="true">Return It</option>
+          <option value="false">غير مرجع</option>
+          <option value="true">إرجاع الطلب</option>
         </select>
 
-        <!-- Gender -->
-        <label for="patientGender">Gender:</label>
+        <!-- الجنس -->
+        <label for="patientGender">الجنس:</label>
         <select v-model="orderData.sex" id="patientGender">
-          <option value="male">Male</option>
-          <option value="female">Female</option>
+          <option value="male">ذكر</option>
+          <option value="female">أنثى</option>
         </select>
         <span class="error" v-if="errors.sex">{{ errors.sex }}</span>
 
-        <!-- Age -->
-        <label for="patientAge">Age:</label>
+        <!-- العمر -->
+        <label for="patientAge">العمر:</label>
         <input
             type="number"
             id="patientAge"
@@ -50,8 +50,8 @@
         />
         <span class="error" v-if="errors.age">{{ errors.age }}</span>
 
-        <!-- Number of Teeth -->
-        <label for="teethCount">Number of Teeth Treated:</label>
+        <!-- عدد الأسنان -->
+        <label for="teethCount">عدد الأسنان المعالجة:</label>
         <input
             type="number"
             id="teethCount"
@@ -61,12 +61,12 @@
         />
         <span class="error" v-if="errors.teethNo">{{ errors.teethNo }}</span>
 
-        <!-- Type of Teeth -->
-        <label for="toothType">Type of Teeth:</label>
+        <!-- نوع الأسنان -->
+        <label for="toothType">نوع الأسنان:</label>
         <input type="text" id="toothType" v-model="orderData.type" required />
         <span class="error" v-if="errors.type">{{ errors.type }}</span>
 
-        <!-- Tooth Selection -->
+        <!-- اختيار الأسنان -->
         <h2>اضغط على السن لاختياره</h2>
         <div
             id="tooth-description"
@@ -76,148 +76,148 @@
           لقد اخترت السن رقم: <span id="tooth-number">{{ selectedTeeth.join(", ") }}</span>
         </div>
 
-        <!-- Upper Teeth (17-32) -->
+        <!-- الأسنان العلوية (17-32) -->
         <div class="teeth-container upper-teeth">
           <div class="tooth-wrapper">
-            <img src="../../assets/img/17.jpeg" alt="Tooth 17" class="tooth-img" :class="{ selected: selectedTeeth.includes(17) }" @click="toggleTooth(17)">
+            <img src="../../assets/img/17.jpeg" alt="السن 17" class="tooth-img" :class="{ selected: selectedTeeth.includes(17) }" @click="toggleTooth(17)">
             <div class="tooth-number">17</div>
           </div>
           <div class="tooth-wrapper">
-            <img src="../../assets/img/18.jpeg" alt="Tooth 18" class="tooth-img" :class="{ selected: selectedTeeth.includes(18) }" @click="toggleTooth(18)">
+            <img src="../../assets/img/18.jpeg" alt="السن 18" class="tooth-img" :class="{ selected: selectedTeeth.includes(18) }" @click="toggleTooth(18)">
             <div class="tooth-number">18</div>
           </div>
           <div class="tooth-wrapper">
-            <img src="../../assets/img/19.jpeg" alt="Tooth 19" class="tooth-img" :class="{ selected: selectedTeeth.includes(19) }" @click="toggleTooth(19)">
+            <img src="../../assets/img/19.jpeg" alt="السن 19" class="tooth-img" :class="{ selected: selectedTeeth.includes(19) }" @click="toggleTooth(19)">
             <div class="tooth-number">19</div>
           </div>
           <div class="tooth-wrapper">
-            <img src="../../assets/img/20.jpeg" alt="Tooth 20" class="tooth-img" :class="{ selected: selectedTeeth.includes(20) }" @click="toggleTooth(20)">
+            <img src="../../assets/img/20.jpeg" alt="السن 20" class="tooth-img" :class="{ selected: selectedTeeth.includes(20) }" @click="toggleTooth(20)">
             <div class="tooth-number">20</div>
           </div>
           <div class="tooth-wrapper">
-            <img src="../../assets/img/21.jpeg" alt="Tooth 21" class="tooth-img" :class="{ selected: selectedTeeth.includes(21) }" @click="toggleTooth(21)">
+            <img src="../../assets/img/21.jpeg" alt="السن 21" class="tooth-img" :class="{ selected: selectedTeeth.includes(21) }" @click="toggleTooth(21)">
             <div class="tooth-number">21</div>
           </div>
           <div class="tooth-wrapper">
-            <img src="../../assets/img/22.jpeg" alt="Tooth 22" class="tooth-img" :class="{ selected: selectedTeeth.includes(22) }" @click="toggleTooth(22)">
+            <img src="../../assets/img/22.jpeg" alt="السن 22" class="tooth-img" :class="{ selected: selectedTeeth.includes(22) }" @click="toggleTooth(22)">
             <div class="tooth-number">22</div>
           </div>
           <div class="tooth-wrapper">
-            <img src="../../assets/img/23.jpeg" alt="Tooth 23" class="tooth-img" :class="{ selected: selectedTeeth.includes(23) }" @click="toggleTooth(23)">
+            <img src="../../assets/img/23.jpeg" alt="السن 23" class="tooth-img" :class="{ selected: selectedTeeth.includes(23) }" @click="toggleTooth(23)">
             <div class="tooth-number">23</div>
           </div>
           <div class="tooth-wrapper">
-            <img src="../../assets/img/24.jpeg" alt="Tooth 24" class="tooth-img" :class="{ selected: selectedTeeth.includes(24) }" @click="toggleTooth(24)">
+            <img src="../../assets/img/24.jpeg" alt="السن 24" class="tooth-img" :class="{ selected: selectedTeeth.includes(24) }" @click="toggleTooth(24)">
             <div class="tooth-number">24</div>
           </div>
           <div class="tooth-wrapper">
-            <img src="../../assets/img/25.jpeg" alt="Tooth 25" class="tooth-img" :class="{ selected: selectedTeeth.includes(25) }" @click="toggleTooth(25)">
+            <img src="../../assets/img/25.jpeg" alt="السن 25" class="tooth-img" :class="{ selected: selectedTeeth.includes(25) }" @click="toggleTooth(25)">
             <div class="tooth-number">25</div>
           </div>
           <div class="tooth-wrapper">
-            <img src="../../assets/img/26.jpeg" alt="Tooth 26" class="tooth-img" :class="{ selected: selectedTeeth.includes(26) }" @click="toggleTooth(26)">
+            <img src="../../assets/img/26.jpeg" alt="السن 26" class="tooth-img" :class="{ selected: selectedTeeth.includes(26) }" @click="toggleTooth(26)">
             <div class="tooth-number">26</div>
           </div>
           <div class="tooth-wrapper">
-            <img src="../../assets/img/27.jpeg" alt="Tooth 27" class="tooth-img" :class="{ selected: selectedTeeth.includes(27) }" @click="toggleTooth(27)">
+            <img src="../../assets/img/27.jpeg" alt="السن 27" class="tooth-img" :class="{ selected: selectedTeeth.includes(27) }" @click="toggleTooth(27)">
             <div class="tooth-number">27</div>
           </div>
           <div class="tooth-wrapper">
-            <img src="../../assets/img/28.jpeg" alt="Tooth 28" class="tooth-img" :class="{ selected: selectedTeeth.includes(28) }" @click="toggleTooth(28)">
+            <img src="../../assets/img/28.jpeg" alt="السن 28" class="tooth-img" :class="{ selected: selectedTeeth.includes(28) }" @click="toggleTooth(28)">
             <div class="tooth-number">28</div>
           </div>
           <div class="tooth-wrapper">
-            <img src="../../assets/img/29.jpeg" alt="Tooth 29" class="tooth-img" :class="{ selected: selectedTeeth.includes(29) }" @click="toggleTooth(29)">
+            <img src="../../assets/img/29.jpeg" alt="السن 29" class="tooth-img" :class="{ selected: selectedTeeth.includes(29) }" @click="toggleTooth(29)">
             <div class="tooth-number">29</div>
           </div>
           <div class="tooth-wrapper">
-            <img src="../../assets/img/30.jpeg" alt="Tooth 30" class="tooth-img" :class="{ selected: selectedTeeth.includes(30) }" @click="toggleTooth(30)">
+            <img src="../../assets/img/30.jpeg" alt="السن 30" class="tooth-img" :class="{ selected: selectedTeeth.includes(30) }" @click="toggleTooth(30)">
             <div class="tooth-number">30</div>
           </div>
           <div class="tooth-wrapper">
-            <img src="../../assets/img/31.jpeg" alt="Tooth 31" class="tooth-img" :class="{ selected: selectedTeeth.includes(31) }" @click="toggleTooth(31)">
+            <img src="../../assets/img/31.jpeg" alt="السن 31" class="tooth-img" :class="{ selected: selectedTeeth.includes(31) }" @click="toggleTooth(31)">
             <div class="tooth-number">31</div>
           </div>
           <div class="tooth-wrapper">
-            <img src="../../assets/img/32.jpeg" alt="Tooth 32" class="tooth-img" :class="{ selected: selectedTeeth.includes(32) }" @click="toggleTooth(32)">
+            <img src="../../assets/img/32.jpeg" alt="السن 32" class="tooth-img" :class="{ selected: selectedTeeth.includes(32) }" @click="toggleTooth(32)">
             <div class="tooth-number">32</div>
           </div>
         </div>
 
-        <!-- Lower Teeth (1-15) -->
+        <!-- الأسنان السفلية (1-15) -->
         <div class="teeth-container lower-teeth">
           <div class="tooth-wrapper">
-            <img src="../../assets/img/1.jpeg" alt="Tooth 1" class="tooth-img" :class="{ selected: selectedTeeth.includes(1) }" @click="toggleTooth(1)">
+            <img src="../../assets/img/1.jpeg" alt="السن 1" class="tooth-img" :class="{ selected: selectedTeeth.includes(1) }" @click="toggleTooth(1)">
             <div class="tooth-number">1</div>
           </div>
           <div class="tooth-wrapper">
-            <img src="../../assets/img/2.jpeg" alt="Tooth 2" class="tooth-img" :class="{ selected: selectedTeeth.includes(2) }" @click="toggleTooth(2)">
+            <img src="../../assets/img/2.jpeg" alt="السن 2" class="tooth-img" :class="{ selected: selectedTeeth.includes(2) }" @click="toggleTooth(2)">
             <div class="tooth-number">2</div>
           </div>
           <div class="tooth-wrapper">
-            <img src="../../assets/img/3.jpeg" alt="Tooth 3" class="tooth-img" :class="{ selected: selectedTeeth.includes(3) }" @click="toggleTooth(3)">
+            <img src="../../assets/img/3.jpeg" alt="السن 3" class="tooth-img" :class="{ selected: selectedTeeth.includes(3) }" @click="toggleTooth(3)">
             <div class="tooth-number">3</div>
           </div>
           <div class="tooth-wrapper">
-            <img src="../../assets/img/4.jpeg" alt="Tooth 4" class="tooth-img" :class="{ selected: selectedTeeth.includes(4) }" @click="toggleTooth(4)">
+            <img src="../../assets/img/4.jpeg" alt="السن 4" class="tooth-img" :class="{ selected: selectedTeeth.includes(4) }" @click="toggleTooth(4)">
             <div class="tooth-number">4</div>
           </div>
           <div class="tooth-wrapper">
-            <img src="../../assets/img/5.jpeg" alt="Tooth 5" class="tooth-img" :class="{ selected: selectedTeeth.includes(5) }" @click="toggleTooth(5)">
+            <img src="../../assets/img/5.jpeg" alt="السن 5" class="tooth-img" :class="{ selected: selectedTeeth.includes(5) }" @click="toggleTooth(5)">
             <div class="tooth-number">5</div>
           </div>
           <div class="tooth-wrapper">
-            <img src="../../assets/img/6.jpeg" alt="Tooth 6" class="tooth-img" :class="{ selected: selectedTeeth.includes(6) }" @click="toggleTooth(6)">
+            <img src="../../assets/img/6.jpeg" alt="السن 6" class="tooth-img" :class="{ selected: selectedTeeth.includes(6) }" @click="toggleTooth(6)">
             <div class="tooth-number">6</div>
           </div>
           <div class="tooth-wrapper">
-            <img src="../../assets/img/7.jpeg" alt="Tooth 7" class="tooth-img" :class="{ selected: selectedTeeth.includes(7) }" @click="toggleTooth(7)">
+            <img src="../../assets/img/7.jpeg" alt="السن 7" class="tooth-img" :class="{ selected: selectedTeeth.includes(7) }" @click="toggleTooth(7)">
             <div class="tooth-number">7</div>
           </div>
           <div class="tooth-wrapper">
-            <img src="../../assets/img/8.jpeg" alt="Tooth 8" class="tooth-img" :class="{ selected: selectedTeeth.includes(8) }" @click="toggleTooth(8)">
+            <img src="../../assets/img/8.jpeg" alt="السن 8" class="tooth-img" :class="{ selected: selectedTeeth.includes(8) }" @click="toggleTooth(8)">
             <div class="tooth-number">8</div>
           </div>
           <div class="tooth-wrapper">
-            <img src="../../assets/img/9.jpeg" alt="Tooth 9" class="tooth-img" :class="{ selected: selectedTeeth.includes(9) }" @click="toggleTooth(9)">
+            <img src="../../assets/img/9.jpeg" alt="السن 9" class="tooth-img" :class="{ selected: selectedTeeth.includes(9) }" @click="toggleTooth(9)">
             <div class="tooth-number">9</div>
           </div>
           <div class="tooth-wrapper">
-            <img src="../../assets/img/10.jpeg" alt="Tooth 10" class="tooth-img" :class="{ selected: selectedTeeth.includes(10) }" @click="toggleTooth(10)">
+            <img src="../../assets/img/10.jpeg" alt="السن 10" class="tooth-img" :class="{ selected: selectedTeeth.includes(10) }" @click="toggleTooth(10)">
             <div class="tooth-number">10</div>
           </div>
           <div class="tooth-wrapper">
-            <img src="../../assets/img/11.jpeg" alt="Tooth 11" class="tooth-img" :class="{ selected: selectedTeeth.includes(11) }" @click="toggleTooth(11)">
+            <img src="../../assets/img/11.jpeg" alt="السن 11" class="tooth-img" :class="{ selected: selectedTeeth.includes(11) }" @click="toggleTooth(11)">
             <div class="tooth-number">11</div>
           </div>
           <div class="tooth-wrapper">
-            <img src="../../assets/img/12.jpeg" alt="Tooth 12" class="tooth-img" :class="{ selected: selectedTeeth.includes(12) }" @click="toggleTooth(12)">
+            <img src="../../assets/img/12.jpeg" alt="السن 12" class="tooth-img" :class="{ selected: selectedTeeth.includes(12) }" @click="toggleTooth(12)">
             <div class="tooth-number">12</div>
           </div>
           <div class="tooth-wrapper">
-            <img src="../../assets/img/13.jpeg" alt="Tooth 13" class="tooth-img" :class="{ selected: selectedTeeth.includes(13) }" @click="toggleTooth(13)">
+            <img src="../../assets/img/13.jpeg" alt="السن 13" class="tooth-img" :class="{ selected: selectedTeeth.includes(13) }" @click="toggleTooth(13)">
             <div class="tooth-number">13</div>
           </div>
           <div class="tooth-wrapper">
-            <img src="../../assets/img/14.jpeg" alt="Tooth 14" class="tooth-img" :class="{ selected: selectedTeeth.includes(14) }" @click="toggleTooth(14)">
+            <img src="../../assets/img/14.jpeg" alt="السن 14" class="tooth-img" :class="{ selected: selectedTeeth.includes(14) }" @click="toggleTooth(14)">
             <div class="tooth-number">14</div>
           </div>
           <div class="tooth-wrapper">
-            <img src="../../assets/img/15.jpeg" alt="Tooth 15" class="tooth-img" :class="{ selected: selectedTeeth.includes(15) }" @click="toggleTooth(15)">
+            <img src="../../assets/img/15.jpeg" alt="السن 15" class="tooth-img" :class="{ selected: selectedTeeth.includes(15) }" @click="toggleTooth(15)">
             <div class="tooth-number">15</div>
           </div>
           <div class="tooth-wrapper">
-            <img src="../../assets/img/1.jpeg" alt="Tooth 1" class="tooth-img" :class="{ selected: selectedTeeth.includes(1) }" @click="toggleTooth(16)">
+            <img src="../../assets/img/1.jpeg" alt="السن 1" class="tooth-img" :class="{ selected: selectedTeeth.includes(1) }" @click="toggleTooth(16)">
             <div class="tooth-number">16</div>
           </div>
         </div>
 
-        <!-- Color -->
-        <label for="color">Color:</label>
+        <!-- اللون -->
+        <label for="color">اللون:</label>
         <input type="text" id="color" v-model="orderData.color" required />
         <span class="error" v-if="errors.color">{{ errors.color }}</span>
 
-        <label for="notes">Notes:</label>
+        <label for="notes">ملاحظات:</label>
         <textarea
             id="notes"
             v-model="orderData.description"
@@ -225,8 +225,8 @@
         ></textarea>
         <span class="error" v-if="errors.description">{{ errors.description }}</span>
 
-        <!-- Deadline -->
-        <label for="deadline">Deadline Date:</label>
+        <!-- تاريخ التسليم -->
+        <label for="deadline">تاريخ التسليم:</label>
         <input
             type="date"
             id="deadline"
@@ -235,57 +235,57 @@
         />
         <span class="error" v-if="errors.deadline">{{ errors.deadline }}</span>
 
-        <!-- Audio -->
-        <label for="audio">Audio Recording:</label>
-        <input
-            type="file"
-            id="audio"
-            accept="audio/*"
-            class="file-input"
-            @change="handleFileUpload($event, 'video')"
-        />
-        <span class="error" v-if="errors.video">{{ errors.video }}</span>
+        <!-- تسجيل صوتي -->
+<!--        <label for="audio">تسجيل صوتي:</label>-->
+<!--        <input-->
+<!--            type="file"-->
+<!--            id="audio"-->
+<!--            accept="audio/*"-->
+<!--            class="file-input"-->
+<!--            @change="handleFileUpload($event, 'video')"-->
+<!--        />-->
+<!--        <span class="error" v-if="errors.video">{{ errors.video }}</span>-->
 
-        <!-- Images -->
-        <label for="photo">Images (up to 3):</label>
-        <input
-            type="file"
-            id="photo"
-            accept="image/*"
-            class="file-input"
-            multiple
-            @change="handleFileUpload($event, 'images')"
-        />
-        <span class="error" v-if="errors.images">{{ errors.images }}</span>
+<!--        &lt;!&ndash; صور &ndash;&gt;-->
+<!--        <label for="photo">صور (بحد أقصى 3):</label>-->
+<!--        <input-->
+<!--            type="file"-->
+<!--            id="photo"-->
+<!--            accept="image/*"-->
+<!--            class="file-input"-->
+<!--            multiple-->
+<!--            @change="handleFileUpload($event, 'images')"-->
+<!--        />-->
+<!--        <span class="error" v-if="errors.images">{{ errors.images }}</span>-->
 
-        <!-- Submit Button -->
-        <button type="submit" @click="updateOrder">Update</button>
+        <!-- زر التحديث -->
+        <button type="submit" @click="updateOrder">تحديث</button>
 
       </fieldset>
-      <!-- Printable Area -->
+      <!-- منطقة الطباعة -->
       <div class="print-area" ref="printableArea" style="display: none;">
         <div class="print-container">
-          <h2>Order Details</h2>
-          <p><strong>Order ID:</strong> <span>{{ orderId || '--' }}</span></p>
-          <p><strong>Patient Name:</strong> <span>{{ orderData.patientName || '--' }}</span></p>
-          <p><strong>Gender:</strong> <span>{{ orderData.sex || '--' }}</span></p>
-          <p><strong>Age:</strong> <span>{{ orderData.age || '--' }}</span></p>
-          <p><strong>Status:</strong> <span>{{ orderData.prova ? 'Provisional' : 'Final' }}</span></p>
-          <p><strong>Scan File:</strong> <span>{{ orderData.scanFile ? 'Yes' : 'No' }}</span></p>
-          <p><strong>Number of Teeth:</strong> <span>{{ orderData.teethNo || '--' }}</span></p>
-          <p><strong>Selected Teeth:</strong> <span>{{ selectedTeeth.length > 0 ? selectedTeeth.join(', ') : '--' }}</span></p>
-          <p><strong>Lab:</strong> <span>{{ labs.find(lab => lab._id === orderData.labId)?.username || '--' }}</span></p>
-          <p><strong>Tooth Type:</strong> <span>{{ orderData.type || '--' }}</span></p>
-          <p><strong>Tooth Color:</strong> <span>{{ orderData.color || '--' }}</span></p>
-          <p><strong>Notes:</strong> <span>{{ orderData.description || '--' }}</span></p>
-          <p><strong>Price:</strong> <span>{{ formatCurrency(calculatedPrice) }}</span></p>
-          <p><strong>Deadline:</strong> <span>{{ orderData.deadline || '--' }}</span></p>
-          <p><strong>Media Files:</strong> <span>{{ orderData.media.length > 0 ? orderData.media.map(file => file.name).join(', ') : '--' }}</span></p>
+          <h2>تفاصيل الطلب</h2>
+          <p><strong>رقم الطلب:</strong> <span>{{ orderId || '--' }}</span></p>
+          <p><strong>اسم المريض:</strong> <span>{{ orderData.patientName || '--' }}</span></p>
+          <p><strong>الجنس:</strong> <span>{{ orderData.sex || '--' }}</span></p>
+          <p><strong>العمر:</strong> <span>{{ orderData.age || '--' }}</span></p>
+          <p><strong>الحالة:</strong> <span>{{ orderData.prova ? 'مؤقت' : 'نهائي' }}</span></p>
+          <p><strong>ملف المسح:</strong> <span>{{ orderData.scanFile ? 'نعم' : 'لا' }}</span></p>
+          <p><strong>عدد الأسنان:</strong> <span>{{ orderData.teethNo || '--' }}</span></p>
+          <p><strong>الأسنان المختارة:</strong> <span>{{ selectedTeeth.length > 0 ? selectedTeeth.join(', ') : '--' }}</span></p>
+          <p><strong>المعمل:</strong> <span>{{ labs.find(lab => lab._id === orderData.labId)?.username || '--' }}</span></p>
+          <p><strong>نوع الأسنان:</strong> <span>{{ orderData.type || '--' }}</span></p>
+          <p><strong>لون الأسنان:</strong> <span>{{ orderData.color || '--' }}</span></p>
+          <p><strong>ملاحظات:</strong> <span>{{ orderData.description || '--' }}</span></p>
+          <p><strong>السعر:</strong> <span>{{ formatCurrency(calculatedPrice) }}</span></p>
+          <p><strong>تاريخ التسليم:</strong> <span>{{ orderData.deadline || '--' }}</span></p>
+          <p><strong>الملفات المرفقة:</strong> <span>{{ orderData.media.length > 0 ? orderData.media.map(file => file.name).join(', ') : '--' }}</span></p>
         </div>
       </div>
       <div class="action-buttons" style="margin-top: 25px">
-        <!-- Print Icon -->
-        <div class="action-icon" @click="printOrder" title="Print Order">
+        <!-- أيقونة الطباعة -->
+        <div class="action-icon" @click="printOrder" title="طباعة الطلب">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M6 9V2H18V9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             <path d="M6 18H4C2.89543 18 2 17.1046 2 16V11C2 9.89543 2.89543 9 4 9H20C21.1046 9 22 9.89543 22 11V16C22 17.1046 21.1046 18 20 18H18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -296,12 +296,11 @@
     </form>
   </div>
 
-  <!-- Chat Icon -->
-  <div class="chat-icon" title="Chat with us">
+  <!-- أيقونة الدردشة -->
+  <div class="chat-icon" title="الدردشة معنا">
     <font-awesome-icon icon="comments" />
   </div>
 </template>
-
 <script>
 import labNavbar from "@/components/navbars/doctorNavbar.vue";
 import axios from "axios";

@@ -104,24 +104,28 @@ export default {
         let username = '';
         let token = '';
         let uid = '';
-
+        // let role = '';
         // Handle different response structures based on user type
         switch(this.userType) {
           case 'doctor':
             username = response.data.result?.doctor?.username || '';
             uid = response.data.result?.doctor.UID;
             localStorage.setItem("uid", uid);
+            localStorage.setItem("role", "doctor");
+            console.log(response.data);
             token = response.data.result?.token || '';
             this.$router.push('/create-order');
             break;
           case 'lab':
             username = response.data.lab?.username || '';
             token = response.data.token || '';
-            this.$router.push('/lab')
+            this.$router.push('/lab');
+            localStorage.setItem("role", "lab");
             break;
           case 'delivery':
             username = response.data.result?.delivery?.username || '';
             token = response.data.result?.token || '';
+            localStorage.setItem("role", "del");
             break;
           default:
             username = response.data.result?.user?.username || '';
