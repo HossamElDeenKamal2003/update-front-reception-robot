@@ -11,10 +11,10 @@
         <!-- Status -->
         <label for="status">الحالة:</label>
         <select v-model="orderData.prova" id="status">
-          <option :value="true">مؤقت</option>
+          <option :value="true">تجريبي/option>
           <option :value="false">نهائي</option>
         </select>
-        <label for="scanFile">ملف المسح:</label>
+        <label for="scanFile">ملف السكان</label>
         <select v-model="orderData.scanFile" id="scanFile">
           <option :value="false">لا</option>
           <option :value="true">نعم</option>
