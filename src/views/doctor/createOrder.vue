@@ -1,4 +1,4 @@
-```vue
+pm run serve```vue
 <template>
   <DoctorNavbar />
   <div class="form-container" ref="formContainer">
@@ -11,7 +11,7 @@
         <!-- Status -->
         <label for="status">الحالة:</label>
         <select v-model="orderData.prova" id="status">
-          <option :value="true">تجريبي/option>
+          <option :value="true">تجريبي</option>
           <option :value="false">نهائي</option>
         </select>
         <label for="scanFile">ملف السكان</label>
