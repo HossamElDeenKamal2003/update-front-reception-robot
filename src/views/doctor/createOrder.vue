@@ -38,7 +38,12 @@ pm run serve```vue
           <option value="female">أنثى</option>
         </select>
         <span class="error" v-if="errors.sex">{{ errors.sex }}</span>
-
+        <label for="patientGender">حالة الاوردر:</label>
+        <select v-model="orderData.save" id="patientGender">
+          <option value="true">حفظ الاوردر فقط</option>
+          <option value="false">اوردر مستعجل</option>
+        </select>
+        <span class="error" v-if="errors.sex">{{ errors.save }}</span>
         <!-- Age -->
         <label for="patientAge">العمر:</label>
         <input
@@ -417,6 +422,7 @@ export default {
         prova: true,
         scanFile: false,
         media: [],
+        save: true
       },
       baseUrl: "https://rr-5d46.onrender.com",
       errors: {},
