@@ -1,32 +1,31 @@
 <template>
   <div>
-    <!-- Navbar -->
+    <!-- شريط التنقل -->
     <nav class="navbar">
       <div class="navbar-container">
         <div class="navbar-logo">
           <router-link to="/">
-            <img src="@/assets/logo.jpeg" alt="Logo" />
+            <img src="@/assets/logo.jpeg" alt="شعار" />
           </router-link>
         </div>
 
-        <!-- Nav Links for larger screens -->
+        <!-- روابط التنقل للشاشات الكبيرة -->
         <div class="nav-links desktop-only">
-          <router-link to="/create-order">Create Order</router-link>
-
-          <router-link to="/doctor/orders">Orders</router-link>
-<!--          <router-link to="/accounts">Accounts</router-link>-->
+          <router-link to="/create-order">إنشاء طلب</router-link>
+          <router-link to="/saved-orders">الاوردرات المحفوظة</router-link>
+          <router-link to="/doctor/orders">الطلبات</router-link>
           <div v-if="username" class="user-info">
-            <span>Welcome, {{ username }}</span>
+            <span>مرحباً، {{ username }}</span>
             <div v-if="uid" class="uid-display">
               <span class="uid-label">ID:</span>
               <span class="uid-value">{{ uid }}</span>
             </div>
-            <a href="#" class="logout" @click.prevent="logout">Logout</a>
+            <a href="#" class="logout" @click.prevent="logout">تسجيل الخروج</a>
           </div>
-          <router-link v-else to="/login">Login</router-link>
+          <router-link v-else to="/login">تسجيل الدخول</router-link>
         </div>
 
-        <!-- Hamburger button for mobile -->
+        <!-- زر القائمة للجوال -->
         <div class="hamburger mobile-only" @click="toggleDrawer">
           <span :class="{ 'open': drawerOpen }"></span>
           <span :class="{ 'open': drawerOpen }"></span>
@@ -35,24 +34,24 @@
       </div>
     </nav>
 
-    <!-- Drawer for mobile navigation -->
+    <!-- درج التنقل للجوال -->
     <transition name="slide">
       <div class="drawer" v-if="drawerOpen">
         <div class="drawer-header">
           <button class="close-btn" @click="toggleDrawer">&times;</button>
         </div>
         <div class="drawer-links">
-          <router-link to="/allorders" @click="toggleDrawer">Orders</router-link>
-          <router-link to="/accounts" @click="toggleDrawer">Accounts</router-link>
+          <router-link to="/allorders" @click="toggleDrawer">الطلبات</router-link>
+          <router-link to="/accounts" @click="toggleDrawer">الحسابات</router-link>
           <div v-if="username" class="user-info">
-            <span>Welcome, {{ username }}</span>
+            <span>مرحباً، {{ username }}</span>
             <div v-if="uid" class="uid-display">
-              <span class="uid-label">ID:</span>
+              <span class="uid-label">المعرف:</span>
               <span class="uid-value">{{ uid }}</span>
             </div>
-            <a href="#" class="logout" @click.prevent="logout">Logout</a>
+            <a href="#" class="logout" @click.prevent="logout">تسجيل الخروج</a>
           </div>
-          <router-link v-else to="/login" @click="toggleDrawer">Login</router-link>
+          <router-link v-else to="/login" @click="toggleDrawer">تسجيل الدخول</router-link>
         </div>
       </div>
     </transition>
@@ -92,7 +91,7 @@ export default {
 </script>
 
 <style scoped>
-/* Navbar Styles */
+/* أنماط شريط التنقل */
 .navbar {
   position: fixed;
   top: 0;
@@ -120,7 +119,7 @@ export default {
   border-radius: 50%;
 }
 
-/* Desktop links */
+/* روابط سطح المكتب */
 .nav-links {
   display: flex;
   gap: 20px;
@@ -138,7 +137,7 @@ export default {
   color: #007bff;
 }
 
-/* Enhanced UID Display */
+/* عرض معرف محسن */
 .uid-display {
   display: flex;
   align-items: center;
@@ -152,18 +151,18 @@ export default {
 }
 
 .uid-value {
-  font-weight: 800; /* Extra bold */
+  font-weight: 800; /* غامق جداً */
   font-size: 0.9rem;
   font-family: 'Courier New', monospace;
-  background-color: #4CAF50; /* Green background */
+  background-color: #4CAF50; /* خلفية خضراء */
   color: white;
   padding: 4px 8px;
   border-radius: 4px;
-  border: 2px solid #388E3C; /* Darker green border */
+  border: 2px solid #388E3C; /* إطار أخضر داكن */
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-/* User Info */
+/* معلومات المستخدم */
 .user-info {
   display: flex;
   align-items: center;
@@ -181,7 +180,7 @@ export default {
   text-decoration: underline;
 }
 
-/* Hamburger Menu and Drawer styles remain the same */
+/* أنماط قائمة الهامبرجر والدرج تبقى كما هي */
 .hamburger {
   cursor: pointer;
   display: flex;
@@ -258,7 +257,7 @@ export default {
   transform: translateX(100%);
 }
 
-/* Responsive Utility Classes */
+/* فئات الأدوات المتجاوبة */
 .desktop-only {
   display: flex;
 }
@@ -275,7 +274,7 @@ export default {
     display: flex;
   }
 
-  /* Mobile-specific UID styling */
+  /* تخصيص عرض المعرف للجوال */
   .uid-display {
     flex-direction: column;
     align-items: flex-start;

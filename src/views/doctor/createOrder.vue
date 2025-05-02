@@ -38,12 +38,12 @@ pm run serve```vue
           <option value="female">أنثى</option>
         </select>
         <span class="error" v-if="errors.sex">{{ errors.sex }}</span>
-        <label for="patientGender">حالة الاوردر:</label>
-        <select v-model="orderData.save" id="patientGender">
-          <option value="true">حفظ الاوردر فقط</option>
-          <option value="false">اوردر مستعجل</option>
-        </select>
-        <span class="error" v-if="errors.sex">{{ errors.save }}</span>
+<!--        <label for="patientGender">حالة الاوردر:</label>-->
+<!--        <select v-model="orderData.save" id="patientGender">-->
+<!--          <option value="true">حفظ الاوردر فقط</option>-->
+<!--          <option value="false">اوردر مستعجل</option>-->
+<!--        </select>-->
+<!--        <span class="error" v-if="errors.sex">{{ errors.save }}</span>-->
         <!-- Age -->
         <label for="patientAge">العمر:</label>
         <input
@@ -312,7 +312,15 @@ pm run serve```vue
         <!--        <span class="error" v-if="errors.images">{{ errors.images }}</span>-->
 
         <!-- Submit Button -->
-        <button type="submit">إرسال</button>
+        <div class="submit-buttons">
+          <button type="button" class="save-btn" @click="submitOrder(true)">
+            حفظ كمسودة
+          </button>
+          <button type="submit" class="submit-btn">
+            إرسال الطلب
+          </button>
+        </div>
+
 
         <!-- Print Icon Inside Form (Matching ShowOrder.vue) -->
         <div class="print-icon" @click="printForm" title="طباعة كملف PDF">
@@ -626,7 +634,7 @@ export default {
       return labels[field] || field;
     },
 
-    async submitOrder() {
+    async submitOrder(saved = false) {
       if (!this.validateForm()) {
         return;
       }
@@ -640,6 +648,7 @@ export default {
         }
 
         this.orderData.price = this.calculatedPrice;
+        this.orderData.save = saved; // Set the save status based on the button clicked
 
         Object.keys(this.orderData).forEach(key => {
           if (key === 'media') {
@@ -661,7 +670,9 @@ export default {
               },
             }
         );
-        alert(response.data.message);
+        console.log(response);
+        const message = saved ? "تم حفظ الطلب كمسودة بنجاح" : "تم إرسال الطلب بنجاح";
+        alert(message);
 
         const randomLetters =
             String.fromCharCode(65 + Math.floor(Math.random() * 26)) +
@@ -669,13 +680,12 @@ export default {
         const randomDigits = Math.floor(10 + Math.random() * 90);
         this.orderId = `Order ID: ${randomLetters}${randomDigits}`;
 
-        this.showSuccess("Order created successfully!");
+        this.showSuccess(message);
         this.resetForm();
       } catch (error) {
         this.handleApiError(error);
       }
     },
-
     handleApiError(error) {
       if (error.response) {
         switch (error.response.status) {
@@ -1225,5 +1235,47 @@ button:hover {
     font-size: 0.6rem;
   }
 }
+.submit-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.save-btn {
+  background-color: #6c757d;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  flex: 1;
+  transition: background-color 0.3s;
+}
+
+.save-btn:hover {
+  background-color: #5a6268;
+}
+
+.submit-btn {
+  background-color: #4caf50;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  flex: 1;
+  transition: background-color 0.3s;
+}
+
+.submit-btn:hover {
+  background-color: #45a049;
+}
+
+@media (max-width: 768px) {
+  .submit-buttons {
+    flex-direction: column;
+  }
+}
+
 </style>
 ```

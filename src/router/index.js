@@ -11,7 +11,8 @@ import addDoctor from "@/views/lab/addDoctor.vue";
 import contract from "@/views/lab/contractView.vue";
 import deliverMain from "@/views/Delivery/pageDelivery.vue";
 import BillingDashboard from "@/views/lab/accountsView.vue";
-import SignupComponent from "@/views/auth/signup.vue"
+import SignupComponent from "@/views/auth/signup.vue";
+import savedOrders from "@/views/doctor/savedOrders.vue";
 const routes = [
   {
     path:'/',
@@ -104,6 +105,11 @@ const routes = [
     path: '/accounts',
     name: 'BillingDashboard',
     component: BillingDashboard,
+  },
+  {
+    path: "/saved-orders",
+    name: "savedOrders",
+    component: savedOrders,
   }
 ]
 
