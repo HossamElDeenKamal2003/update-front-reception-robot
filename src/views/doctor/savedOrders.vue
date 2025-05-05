@@ -1,3 +1,4 @@
+```vue
 <template>
   <div>
     <nav-no-anim />
@@ -233,14 +234,18 @@ export default {
           return;
         }
 
+        // Debug log to verify payload
+        console.log("Sending saved orders:", { orderIds, labId: group.labId });
+
         await axios.post(`${this.baseUrl}/saved/send/${group.labId}`,
-            { orderIds },
+            { orderIds, save: false }, // Explicitly set save to false
             { headers: { Authorization: `Bearer ${token}` } }
         );
 
         alert("تم إرسال الطلبات بنجاح");
         this.fetchOrders();
       } catch (error) {
+        console.error("Error in sendSavedOrders:", error);
         if (error.response && error.response.data && error.response.data.message && error.response.data.message.includes("E11000 duplicate key")) {
           this.error = "خطأ: لا يمكن إرسال الطلبات لأن هناك طلبات مكررة لهذا الطبيب. يرجى التواصل مع الدعم.";
         } else {
@@ -596,3 +601,4 @@ h2 {
   }
 }
 </style>
+```

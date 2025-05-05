@@ -4,7 +4,7 @@ pm run serve```vue
   <div class="form-container" ref="formContainer">
     <div class="order-id-box">{{ orderId || 'رقم الطلب: --' }}</div>
 
-    <form @submit.prevent="submitOrder">
+    <form @submit.prevent="submitOrder(false)">
       <fieldset>
         <legend>معلومات المريض</legend>
 
@@ -432,7 +432,7 @@ export default {
         media: [],
         save: true
       },
-      baseUrl: "https://rr-5d46.onrender.com",
+      baseUrl: "http://localhost:3000",
       errors: {},
       upperTeeth: [17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32],
       lowerTeeth: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
@@ -634,22 +634,45 @@ export default {
       return labels[field] || field;
     },
 
-    async submitOrder(saved = false) {
-      if (!this.validateForm()) {
-        return;
-      }
+    async submitOrder(saved = false, event = null) {
+      if (event) event.preventDefault();
+
+      // Show loading state
+      const loadingToastId = toast.loading("Processing your request...", {
+        position: toast.POSITION.TOP_CENTER
+      });
 
       try {
-        const formData = new FormData();
+        // Validate form
+        if (!this.validateForm()) {
+          toast.update(loadingToastId, {
+            render: "Please fix form errors",
+            type: toast.TYPE.ERROR,
+            isLoading: false,
+            autoClose: 3000
+          });
+          return;
+        }
 
+        // Prepare form data
+        const formData = new FormData();
         if (this.selectedTeeth.length > 0) {
           const teethNote = `Teeth numbers: ${this.selectedTeeth.join(', ')}. `;
           this.orderData.description = teethNote + (this.orderData.description || '');
         }
 
         this.orderData.price = this.calculatedPrice;
-        this.orderData.save = saved; // Set the save status based on the button clicked
+        this.orderData.save = Boolean(saved);
 
+        // Log for debugging (remove in production)
+        if (process.env.NODE_ENV === 'development') {
+          console.debug("Submitting order:", {
+            ...this.orderData,
+            media: this.orderData.media.map(f => f.name)
+          });
+        }
+
+        // Append all data to FormData
         Object.keys(this.orderData).forEach(key => {
           if (key === 'media') {
             this.orderData.media.forEach((file, index) => {
@@ -660,6 +683,7 @@ export default {
           }
         });
 
+        // Submit the form
         const response = await axios.post(
             `${this.baseUrl}/orders/create`,
             formData,
@@ -668,24 +692,87 @@ export default {
                 "Content-Type": "multipart/form-data",
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
               },
+              timeout: 10000 // 10 second timeout
             }
         );
-        console.log(response);
-        const message = saved ? "تم حفظ الطلب كمسودة بنجاح" : "تم إرسال الطلب بنجاح";
-        alert(message);
+        console.log("Response:", response);
+        // Success handling
+        const message = saved ?
+            "Draft saved successfully" :
+            "Order submitted successfully";
 
-        const randomLetters =
-            String.fromCharCode(65 + Math.floor(Math.random() * 26)) +
-            String.fromCharCode(65 + Math.floor(Math.random() * 26));
-        const randomDigits = Math.floor(10 + Math.random() * 90);
-        this.orderId = `Order ID: ${randomLetters}${randomDigits}`;
+        toast.update(loadingToastId, {
+          render: message,
+          type: toast.TYPE.SUCCESS,
+          isLoading: false,
+          autoClose: 3000
+        });
 
-        this.showSuccess(message);
+        // Generate order ID
+        this.orderId = this.generateOrderId();
+
+        // Reset form
         this.resetForm();
+
+        // Optional: Track successful submission
+        this.trackSubmission(saved ? 'draft' : 'order');
+
       } catch (error) {
-        this.handleApiError(error);
+        // Error handling
+        toast.update(loadingToastId, {
+          render: this.getErrorMessage(error),
+          type: toast.TYPE.ERROR,
+          isLoading: false,
+          autoClose: 5000
+        });
+
+        // Log full error in development
+        if (process.env.NODE_ENV === 'development') {
+          console.error("Submission error:", error);
+        }
       }
     },
+
+// Helper methods
+    generateOrderId() {
+      const randomLetters = String.fromCharCode(
+          65 + Math.floor(Math.random() * 26),
+          65 + Math.floor(Math.random() * 26)
+      );
+      const randomDigits = Math.floor(10 + Math.random() * 90);
+      return `ORD-${randomLetters}${randomDigits}-${Date.now().toString().slice(-4)}`;
+    },
+
+    getErrorMessage(error) {
+      if (error.response) {
+        switch (error.response.status) {
+          case 400:
+            return error.response.data.message || "Invalid data submitted";
+          case 401:
+            return "Session expired. Please login again";
+          case 403:
+            return "You don't have permission for this action";
+          case 408:
+          case 504:
+            return "Request timeout. Please try again";
+          case 500:
+            return "Server error. Please contact support";
+          default:
+            return "An unexpected error occurred";
+        }
+      } else if (error.request) {
+        return "Network error. Please check your connection";
+      } else {
+        return "An error occurred. Please try again";
+      }
+    },
+
+    // trackSubmission(type) {
+    //   // In a real app, you might send to analytics
+    //   if (window.ga) {
+    //     ga('send', 'event', 'Order', type, this.orderId);
+    //   }
+    // },
     handleApiError(error) {
       if (error.response) {
         switch (error.response.status) {
