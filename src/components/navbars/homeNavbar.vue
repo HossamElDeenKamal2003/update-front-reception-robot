@@ -5,7 +5,6 @@
       <li><a href=/create-order>Doctors</a></li>
       <li><a href="/lab">Lab</a></li>
       <li><a href="/deliver-main">Delivery</a></li>
-      <li><a href="#shope">Shop</a></li>
     </ul>
     <div class="auth-buttons">
       <template v-if="username">
