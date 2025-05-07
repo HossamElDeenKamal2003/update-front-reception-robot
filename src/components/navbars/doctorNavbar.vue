@@ -80,6 +80,7 @@ export default {
       localStorage.removeItem("token");
       localStorage.removeItem("username");
       localStorage.removeItem("uid");
+      localStorage.removeItem("role");
       this.drawerOpen = false;
       this.$router.push({ name: "login" });
     },

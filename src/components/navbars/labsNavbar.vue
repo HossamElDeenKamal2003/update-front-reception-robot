@@ -71,7 +71,8 @@ export default {
       // Remove user data
       localStorage.removeItem("token");
       localStorage.removeItem("username");
-
+      localStorage.removeItem("uid");
+      localStorage.removeItem("role");
       // Close the drawer if it is open
       this.drawerOpen = false;
 

@@ -6,13 +6,25 @@
       <li><a href="#accounts">Accounts</a></li>
     </ul>
     <div class="logout">
-      <a href="#logout">Logout</a>
+      <a href="#" class="logout" @click.prevent="logout">Logout</a>
     </div>
   </div>
 </template>
 
-<script setup>
-// No logic needed here yet
+<script>
+  export default {
+    name: 'DeliveryNavbar',
+    data() {
+      return {
+        username: ""
+      }
+    },
+    methods: {
+      logout(){
+        localStorage.clear();
+      }
+    }
+  }
 </script>
 
 <style scoped>

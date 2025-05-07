@@ -39,6 +39,8 @@ export default {
     handleLogout() {
       localStorage.removeItem("username");
       localStorage.removeItem("token");
+      localStorage.removeItem("uid");
+      localStorage.removeItem("role");
       this.username = "";
       // Redirect to home or login page if needed
       if (this.$route.path !== '/') {

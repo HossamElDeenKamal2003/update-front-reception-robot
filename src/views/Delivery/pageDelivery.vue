@@ -124,7 +124,7 @@ export default {
       refreshInterval: null,
       activeTab: 'available',
       myOrdersCount: 0,
-      processingOrder: null
+      processingOrder: null,
     };
   },
   created() {
