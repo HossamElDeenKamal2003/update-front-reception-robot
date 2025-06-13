@@ -184,10 +184,10 @@ export default {
   },
   mounted() {
     this.isMounted = true;
-    if (!this.isAuthenticated) {
-      this.$router.push("/login");
-      return;
-    }
+    // if (!this.isAuthenticated) {
+    //   this.$router.push("/login");
+    //   return;
+    // }
     this.fetchOrders();
   },
   beforeUnmount() {

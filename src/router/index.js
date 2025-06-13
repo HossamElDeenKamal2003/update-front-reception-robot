@@ -13,7 +13,13 @@ import deliverMain from "@/views/Delivery/pageDelivery.vue";
 import BillingDashboard from "@/views/lab/accountsView.vue";
 import SignupComponent from "@/views/auth/signup.vue";
 import savedOrders from "@/views/doctor/savedOrders.vue";
+import AdminDashboard from "@/views/admin/adminView.vue";
 const routes = [
+  {
+    path: '/admin',
+    name: 'AdminDashboard',
+    component: AdminDashboard,
+  },
   {
     path:'/',
     name: "homeComponent",
